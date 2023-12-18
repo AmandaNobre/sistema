@@ -1,40 +1,47 @@
-<div class="page">
+<div>
     <div class="top-page">
         <div>
             <div class="d-flex">
-                <i class="pi pi-search icon"></i>
                 <h3>Solicitações</h3>
             </div>
         </div>
         <div>
-            <p-button (click)="clickNew()" icon="pi pi-plus" label="Cadastrar Solicitação"></p-button>
+            <p-button styleClass="w-100" (click)="clickNew()" icon="pi pi-plus"
+                label="Cadastrar Solicitação"></p-button>
         </div>
     </div>
 
-    <form-dynamic-angular [buttonsStandard]=buttonsStandard [form]=formmFilter
-        [control]=controlFilter></form-dynamic-angular>
+    <div class="page">
+        <form-dynamic-angular title="Filtros" [buttonsStandard]=buttonsStandard [form]=formmFilter
+            [control]=controlFilter></form-dynamic-angular>
+    </div>
 
-    <p-table  styleClass="p-datatable-striped" [columns]="cols" [value]="requests" [tableStyle]="{ 'min-width': '50rem' }">
-        <ng-template pTemplate="header" let-columns>
-            <tr>
-                <th *ngFor="let col of columns">
-                    {{ col.header }}
-                </th>
-                <th>Ações</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr>
-                <td *ngFor="let col of columns">
-                    {{ rowData[col.field] }}
-                </td>
-                <td>
-                    <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2" styleClass="p-button-warning "
-                        icon="pi pi-pencil" label="Editar"></p-button>
-                    <p-button (click)="editOrView( rowData['id'], 'view' )" icon="pi pi-eye" styleClass="p-button-info "
-                        label="Visualizar"></p-button>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+    <div class="page">
+
+        <p-table styleClass="p-datatable-striped" [columns]="cols" [value]="requests"
+            [tableStyle]="{ 'min-width': '50rem' }">
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let col of columns">
+                        {{ col.header }}
+                    </th>
+                    <th>Ações</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr>
+                    <td *ngFor="let col of columns">
+                        {{ rowData[col.field] }}
+                    </td>
+                    <td>
+                        <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2"
+                            styleClass="p-button-warning " icon="pi pi-pencil" label="Editar"></p-button>
+                        <p-button (click)="editOrView( rowData['id'], 'view' )" icon="pi pi-eye"
+                            styleClass="p-button-info " label="Visualizar"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
 </div>

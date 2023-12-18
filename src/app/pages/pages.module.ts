@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { ComponentsModule } from '../components/components.module';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 const routes: Routes = [
   {
@@ -10,8 +12,8 @@ const routes: Routes = [
     component: PagesComponent,
     children: [
       { path: '', redirectTo: 'request', pathMatch: 'full' },
-      { path: 'request',  loadChildren: () => import('./request/request.module').then(module => module.RequestModule) },
-      { path: 'forms',  loadChildren: () => import('./forms/forms.module').then(module => module.FormModule) },
+      { path: 'request', loadChildren: () => import('./request/request.module').then(module => module.RequestModule) },
+      { path: 'forms', loadChildren: () => import('./forms/forms.module').then(module => module.FormModule) },
     ]
   }
 ]
@@ -24,7 +26,8 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    ComponentsModule
+    ComponentsModule,
+    ToastModule
   ]
 })
 export class PagesModule { }

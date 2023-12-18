@@ -46,7 +46,8 @@ export class ListComponent implements OnInit {
 
     this.cols = [
       { field: 'type', header: 'Tipo de formulário' },
-      { field: 'user', header: 'Usuário' }
+      { field: 'user', header: 'Usuário' },
+      { field: 'status', header: 'Status' }
     ];
 
     this.service.getAllRequests().subscribe(data => {

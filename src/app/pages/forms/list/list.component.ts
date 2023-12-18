@@ -17,7 +17,7 @@ export class ListComponent implements OnInit {
   formmFilter: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
-    { type: 'clean', onCLick: this.clickNew },
+    { type: 'clean', onCLick: () => this.clean() },
     { type: 'filter', onCLick: () => this.filter() }
   ]
 
@@ -37,7 +37,7 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
     this.formmFilter = [
-      { label: 'Nome', col: 'col-lg-6', type: 'select', formControl: 'form' }
+      { label: 'Nome', col: 'col-md-6', type: 'select', formControl: 'form' }
     ]
 
     this.cols = [
@@ -45,13 +45,14 @@ export class ListComponent implements OnInit {
     ];
 
     this.service.getAllForms().subscribe(data => {
-      this.requests = data as any[]
+      this.requests = data as IOptions[]
+      this.formmFilter[0].options = this.requests
     })
   }
 
   filter() {
     this.service.filter(this.controlFilter.value.form.descricao).subscribe(data => {
-      this.requests = data as any[]
+      this.requests = data as IOptions[]
     })
   }
 
@@ -64,5 +65,14 @@ export class ListComponent implements OnInit {
     this.router.navigate([`${type}/${id}`], { relativeTo: this.route })
   }
 
+  clean() {
+    this.controlFilter = this.fb.group({
+      form: '',
+    })
+    this.service.getAllForms().subscribe(data => {
+      this.requests = data as IOptions[]
+      this.formmFilter[0].options = this.requests
+    })
+  }
 
 }

@@ -9,6 +9,11 @@ import { RequestService } from './service/request.service';
 import { FormDynamicAngularModule } from 'form-dynamic-angular';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+
 const routes: Routes = [
   { path: '', component: ListComponent },
   { path: 'register', component: FormComponent, data: { grouppt: 'Solicitação', groupen: "Request", labelpt: 'Cadastrar Solicitação', labelen: 'Register Request' } },
@@ -27,14 +32,19 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     FormDynamicAngularModule,
-    ButtonModule
+    ButtonModule,
+    ToastModule,
+    ConfirmDialogModule,
+    DialogModule
   ],
   exports: [
     ListComponent,
     FormComponent
   ],
   providers: [
-    RequestService
+    RequestService,
+    MessageService,
+    ConfirmationService
   ]
 })
 export class RequestModule { }

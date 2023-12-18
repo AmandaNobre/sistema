@@ -9,6 +9,16 @@ export class RequestService {
     return this.http.get(`http://localhost:3000/forms`);
   }
 
+  getAllUser() {
+    return this.http.get(`http://localhost:3000/user`);
+  }
+
+
+  getAllCargos() {
+    return this.http.get(`http://localhost:3000/cargos`);
+  }
+
+
   filter(type: string) {
     return this.http.get(`http://localhost:3000/forms?descricao=${type}`)
   }
