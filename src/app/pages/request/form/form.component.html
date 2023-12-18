@@ -1,11 +1,11 @@
 <div class="page">
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="Cadastrar Solicitação"
-        [form]=formmFilter [control]=controlFilter [buttonsOptions]=buttonsOptions></form-dynamic-angular>
+    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Solicitação"
+        [form]=form [control]=control [buttonsOptions]=buttonsOptions></form-dynamic-angular>
 
 
-    <p-dialog header="Rejeitar Solicitação" [(visible)]="visible" [style]="{ width: '50vw', height: '300px' }">
+    <p-dialog  [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible" [style]="{ width: '90vw', height: '500px' }">
         <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject
             [form]=formmReject [control]=controlReject ></form-dynamic-angular>
     </p-dialog>

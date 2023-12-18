@@ -1,4 +1,7 @@
 <div>
+    <p-confirmDialog></p-confirmDialog>
+    <p-toast></p-toast>
+
     <div class="top-page">
         <div>
             <div class="d-flex">
@@ -11,8 +14,8 @@
     </div>
 
     <div class="page">
-        <form-dynamic-angular title="Filtros" [buttonsStandard]=buttonsStandard [form]=formmFilter
-            [control]=controlFilter></form-dynamic-angular>
+        <form-dynamic-angular title="Filtros" [buttonsStandard]=buttonsStandard [form]=form
+            [control]=control></form-dynamic-angular>
     </div>
 
     <div class="page">
@@ -33,8 +36,8 @@
                     <td>
                         <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2"
                             styleClass="p-button-warning " icon="pi pi-pencil" label="Editar"></p-button>
-                        <p-button (click)="editOrView( rowData['id'], 'view' )" icon="pi pi-eye"
-                            styleClass="p-button-info " label="Visualizar"></p-button>
+                        <p-button (click)="remove( rowData['id'])" icon="pi pi-trash" styleClass="p-button-danger "
+                            label="Excluir"></p-button>
                     </td>
                 </tr>
             </ng-template>

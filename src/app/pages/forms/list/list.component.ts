@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormService } from '../service/form.service';
 
 @Component({
   selector: 'app-request',
@@ -11,10 +11,10 @@ import { RequestService } from '../service/request.service';
 
 export class ListComponent implements OnInit {
 
-  controlFilter: UntypedFormGroup = this.fb.group({
+  control: UntypedFormGroup = this.fb.group({
     form: '',
   })
-  formmFilter: IForm[] = []
+  form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
     { type: 'clean', onCLick: () => this.clean() },
@@ -30,13 +30,15 @@ export class ListComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService
+    private service: FormService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {
 
   }
 
   ngOnInit() {
-    this.formmFilter = [
+    this.form = [
       { label: 'Nome', col: 'col-md-6', type: 'select', formControl: 'form' }
     ]
 
@@ -46,12 +48,12 @@ export class ListComponent implements OnInit {
 
     this.service.getAllForms().subscribe(data => {
       this.requests = data as IOptions[]
-      this.formmFilter[0].options = this.requests
+      this.form[0].options = this.requests
     })
   }
 
   filter() {
-    this.service.filter(this.controlFilter.value.form.descricao).subscribe(data => {
+    this.service.filter(this.control.value.form.descricao).subscribe(data => {
       this.requests = data as IOptions[]
     })
   }
@@ -60,18 +62,40 @@ export class ListComponent implements OnInit {
     this.router.navigate([`register`], { relativeTo: this.route })
   }
 
+  remove(id: number) {
+    this.confirmationService.confirm({
+      message: 'Certeza que deseja excluir este formulário',
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonStyleClass: "p-button-text",
+      acceptLabel: "Sim",
+      rejectLabel: "Não",
+      accept: () => {
+        this.service.remove(id).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao exclui formulário' });
+            this.service.getAllForms().subscribe(data => {
+              this.requests = data as IOptions[]
+              this.form[0].options = this.requests
+            })
+          }
+        })
+      }
+    });
+
+  }
 
   editOrView(id: number, type: string) {
     this.router.navigate([`${type}/${id}`], { relativeTo: this.route })
   }
 
   clean() {
-    this.controlFilter = this.fb.group({
+    this.control = this.fb.group({
       form: '',
     })
     this.service.getAllForms().subscribe(data => {
       this.requests = data as IOptions[]
-      this.formmFilter[0].options = this.requests
+      this.form[0].options = this.requests
     })
   }
 

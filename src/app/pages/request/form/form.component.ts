@@ -14,7 +14,7 @@ export class FormComponent {
   id: number = 0
   type: string = ''
 
-  controlFilter: UntypedFormGroup = this.fb.group({
+  control: UntypedFormGroup = this.fb.group({
     form: '',
     t1: '',
     t2: '',
@@ -27,10 +27,10 @@ export class FormComponent {
   })
 
 
-  formmFilter: IForm[] = []
+  form: IForm[] = []
   formmReject: IForm[] = [
-    { label: 'Anexos: ', col: 'col-lg-6', type: 'upload-files', formControl: 'files' },
-    { label: 'Descrição: ', col: 'col-lg-6', type: 'text-area', formControl: 'description' },
+    { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
+    { label: 'Descrição: ', col: 'col-lg-12', type: 'text-area', formControl: 'description' },
 
   ]
 
@@ -45,6 +45,7 @@ export class FormComponent {
   options: IOptions[] = []
 
   visible: boolean = false
+  title: string = "Cadastrar"
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -61,7 +62,7 @@ export class FormComponent {
   ngOnInit() {
     this.service.getAllForms().subscribe(data => {
       this.options = data as IOptions[]
-      this.formmFilter = [
+      this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
       ]
     })
@@ -69,7 +70,7 @@ export class FormComponent {
     if (this.id) {
       this.service.getById(this.id).subscribe(data => {
         var form = data as any
-        this.controlFilter = this.fb.group({
+        this.control = this.fb.group({
           form: form[0].formResponse.form,
           t1: new FormControl({ value: form[0].formResponse.t1, disabled: this.type == "view" }),
           t2: new FormControl({ value: form[0].formResponse.t2, disabled: this.type == "view" }),
@@ -77,12 +78,17 @@ export class FormComponent {
         })
         this.chageValues()
       })
+      this.title = "Editar"
+
+      if(this.type == "view"){
+        this.title = "Visualizar"
+      }
 
     }
 
     if (this.type == 'view') {
       this.buttonsOptions = [
-        { label: "Voltar", icon: "pi pi-angle-left", onCLick: () => this.return(), styleClass: "p-button-warning" },
+        // { label: "Voltar", icon: "pi pi-angle-left", onCLick: () => this.return(), styleClass: "p-button-warning" },
         { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-danger" },
         { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aprove(), styleClass: "p-button-success" },
       ]
@@ -98,10 +104,10 @@ export class FormComponent {
     this.visible = true;
   }
 
-  confirmReject(){
+  confirmReject() {
     var payload = {
-      type: this.controlFilter.value.form.descricao,
-      formResponse: this.controlFilter.value,
+      type: this.control.value.form.descricao,
+      formResponse: this.control.value,
       user: "teste",
       status: "Reprovada"
     }
@@ -109,7 +115,7 @@ export class FormComponent {
     this.service.editRequest(payload, this.id).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-        this.return()
+        setTimeout(() => this.return(), 2000);
       }
     })
   }
@@ -124,8 +130,8 @@ export class FormComponent {
       rejectLabel: "Não",
       accept: () => {
         var payload = {
-          type: this.controlFilter.value.form.descricao,
-          formResponse: this.controlFilter.value,
+          type: this.control.value.form.descricao,
+          formResponse: this.control.value,
           user: "teste",
           status: "Aprovada"
         }
@@ -133,29 +139,30 @@ export class FormComponent {
         this.service.editRequest(payload, this.id).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-            this.return()
+            setTimeout(() => this.return(), 2000);
           }
         })
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Confirmação aprovada com sucesso!' });
-        this.return()
+        setTimeout(() => this.return(), 2000);
+
       }
     });
   }
 
 
   chageValues() {
-    if (this.controlFilter.value.form) {
-      this.formmFilter = [
+    if (this.control.value.form) {
+      this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-12', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
       ]
-      var form = this.controlFilter.value.form
-      if (form.id == 1) {
-        this.formmFilter.push(
+      var form = this.control.value.form
+      if (form.id == 2) {
+        this.form.push(
           { label: 'Nome: ', col: 'col-lg-6', type: 'text', formControl: 't1', disabled: this.type == "view" },
           { label: 'Descrição: ', col: 'col-lg-6', type: 'text', formControl: 't2', disabled: this.type == "view" },
         )
-      } else if (form.id == 2) {
-        this.formmFilter.push(
+      } else if (form.id == 1) {
+        this.form.push(
           { label: 'Tipo de Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't1', disabled: this.type == "view" },
           { label: 'Motivo do Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't2', disabled: this.type == "view" },
           { label: 'Email: ', col: 'col-lg-12', type: 'text', formControl: 't3', disabled: this.type == "view" },
@@ -172,8 +179,8 @@ export class FormComponent {
 
   saveRequest() {
     var payload = {
-      type: this.controlFilter.value.form.descricao,
-      formResponse: this.controlFilter.value,
+      type: this.control.value.form.descricao,
+      formResponse: this.control.value,
       user: "teste",
       status: "Solicitada"
     }
@@ -184,14 +191,14 @@ export class FormComponent {
       this.service.editRequest(payload, this.id).subscribe({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-          this.return()
+          setTimeout(() => this.return(), 2000);
         }
       })
     } else {
       this.service.saveRequest(payload).subscribe({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
-          this.return()
+          setTimeout(() => this.return(), 2000);
         }
       })
     }

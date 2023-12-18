@@ -11,10 +11,10 @@ import { RequestService } from '../service/request.service';
 
 export class ListComponent implements OnInit {
 
-  controlFilter: UntypedFormGroup = this.fb.group({
+  control: UntypedFormGroup = this.fb.group({
     form: '',
   })
-  formmFilter: IForm[] = []
+  form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
     { type: 'clean', onCLick: this.clickNew },
@@ -39,7 +39,7 @@ export class ListComponent implements OnInit {
 
     this.service.getAllForms().subscribe(data => {
 
-      this.formmFilter = [
+      this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: data as IOptions[], formControl: 'form' }
       ]
     })
@@ -56,7 +56,7 @@ export class ListComponent implements OnInit {
   }
 
   filter() {
-    this.service.filter(this.controlFilter.value.form.descricao).subscribe(data => {
+    this.service.filter(this.control.value.form.descricao).subscribe(data => {
       this.requests = data as any[]
     })
   }

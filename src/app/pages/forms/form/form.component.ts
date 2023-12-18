@@ -2,7 +2,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { IButtonsStandard, IForm, IOptions, ITable } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { MessageService } from 'primeng/api';
+import { FormService } from '../service/form.service';
 
 @Component({
   selector: 'app-form-request',
@@ -11,13 +12,12 @@ import { RequestService } from '../service/request.service';
 
 export class FormComponent {
 
-  controlFilter: UntypedFormGroup = this.fb.group({
-    nome: '',
-    aprovacao: '',
+  control: UntypedFormGroup = this.fb.group({
+    descricao: '',
     type: '',
     name: ''
   })
-  formmFilter: IForm[] = []
+  form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
     { type: 'cancel', onCLick: () => this.return() },
@@ -36,23 +36,21 @@ export class FormComponent {
   id: number = 0
   type: string = ''
 
+  title: string = "Cadastrar"
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService
+    private service: FormService,
+    private messageService: MessageService
   ) {
     this.route.params.subscribe(params => this.id = params['id']);
     this.route.params.subscribe(params => this.type = params['type']);
   }
 
   ngOnInit() {
-    if (this.id) {
-      this.service.getById(this.id).subscribe(data => {
-        var form = data as any
-        this.controlFilter = this.fb.group(form[0].formResponse)
-      })
-    }
+
 
     this.service.getAllUser().subscribe(data => {
       var user = data as IOptions[]
@@ -64,42 +62,48 @@ export class FormComponent {
       this.cargos = cargos
     })
 
-    this.formmFilter = [
-      { label: 'Nome', col: 'col-lg-6', type: 'text', formControl: 'nome' },
+    this.form = [
+      { label: 'Nome', col: 'col-lg-6', type: 'text', formControl: 'descricao' },
       { label: 'HIerarquia de Aprovação', col: 'col-md-12' },
       { label: 'Tipo de usuário', col: 'col-md-4', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view" },
       { label: 'Usuário/Cargo', col: 'col-md-4', type: 'select', formControl: 'name', disabled: this.type == "view" },
       { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-4', type: 'button', class: "mt-3", formControl: 'aprovacao', disabled: this.type == "view" },
       { label: '', col: 'col-md-12', type: 'table', formControl: '', tableOptions: this.table },
     ]
-
+    if (this.id) {
+      this.title = "Editar"
+      this.service.getById(this.id).subscribe(data => {
+        var form = data as any
+        console.log('form', form)
+        this.control = this.fb.group(form[0])
+        this.form[5].tableOptions = form[0].table
+      })
+    }
   }
 
   chageValues() {
-    if (this.controlFilter.value.type.id == 1) {
-      this.formmFilter[3].options = this.user
+    if (this.control.value.type.id == 1) {
+      this.form[3].options = this.user
     }
 
-    if (this.controlFilter.value.type.id == 2) {
-      this.formmFilter[3].options = this.cargos
+    if (this.control.value.type.id == 2) {
+      this.form[3].options = this.cargos
     }
   }
 
   add() {
-    const control = this.controlFilter.value
+    const control = this.control.value
 
-    if (control.type.descricao&& control.name.descricao) {
-      console.log('control.name.descricao', control.name.descricao)
-      console.log('control.type.descricao', control.type.descricao)
+    if (control.type.descricao && control.name.descricao) {
       this.table.push({
         c1: control.type.descricao,
         c2: control.name.descricao,
         id: this.table.length + 1,
         button: { label: "", icon: "pi pi-trash", onCLick: (id: number) => this.removeList(id), styleClass: "p-button-danger p-button-outlined" },
       })
-      this.formmFilter[5].tableOptions = this.table
-      this.controlFilter = this.fb.group({
-        nome: '',
+      this.form[5].tableOptions = this.table
+      this.control = this.fb.group({
+        ...control,
         aprovacao: '',
         type: '',
         name: ''
@@ -110,7 +114,7 @@ export class FormComponent {
 
   removeList(id: number) {
     this.table = this.table.filter(t => t.id !== id)
-    this.formmFilter[5].tableOptions = this.table
+    this.form[5].tableOptions = this.table
   }
 
   clickNew() {
@@ -119,18 +123,22 @@ export class FormComponent {
 
   saveRequest() {
     var payload = {
-      descricao: this.controlFilter.value.descricao,
-      aprovadores: this.controlFilter.value.aprovacao,
+      descricao: this.control.value.descricao,
+      table: this.table
     }
 
     if (this.id) {
       this.service.edit(payload, this.id).subscribe({
         next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar formulário' });
+          setTimeout(() => this.return(), 2000);
         }
       })
     } else {
       this.service.save(payload).subscribe({
         next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar formulário' });
+          setTimeout(() => this.return(), 2000);
         }
       })
     }
@@ -139,7 +147,7 @@ export class FormComponent {
   }
 
   return() {
-    this.router.navigate([`/pages/request`], { relativeTo: this.route })
+    this.router.navigate([`/pages/forms`], { relativeTo: this.route })
 
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable()
-export class RequestService {
+export class FormService {
   constructor(public http: HttpClient) { }
 
   getAllForms() {
@@ -11,6 +11,10 @@ export class RequestService {
 
   getAllUser() {
     return this.http.get(`http://localhost:3000/user`);
+  }
+
+  remove(id: number) {
+    return this.http.delete(`http://localhost:3000/forms/${id}`);
   }
 
 

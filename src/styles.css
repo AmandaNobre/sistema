@@ -9,6 +9,9 @@ body {
     margin-bottom: 35px;
 }
 
+.p-toast {
+    width: auto !important;
+}
 
 .top-page {
     display: flex;

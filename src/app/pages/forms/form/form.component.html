@@ -1,3 +1,5 @@
 <div class="page">
-    <form-dynamic-angular  (onChange)=chageValues()  [buttonsStandard]=buttonsStandard title="Cadastrar Formulário" [form]=formmFilter [control]=controlFilter></form-dynamic-angular>
+    <p-toast></p-toast>
+    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Formulário"
+        [form]=form [control]=control></form-dynamic-angular>
 </div>

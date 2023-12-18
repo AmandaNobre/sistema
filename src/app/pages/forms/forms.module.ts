@@ -5,10 +5,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ListComponent } from './list/list.component';
 import { FormComponent } from './form/form.component';
-import { RequestService } from './service/request.service';
 import { FormDynamicAngularModule } from 'form-dynamic-angular';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { FormService } from './service/form.service';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -28,14 +31,18 @@ const routes: Routes = [
     ReactiveFormsModule,
     FormDynamicAngularModule,
     ButtonModule,
-    TableModule
+    TableModule,
+    ToastModule,
+    ConfirmDialogModule
   ],
   exports: [
     ListComponent,
     FormComponent
   ],
   providers: [
-    RequestService
+    FormService,
+    MessageService,
+    ConfirmationService
   ]
 })
 export class FormModule { }
