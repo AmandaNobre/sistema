@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { IButtonsStandard, IForm, IOptions, ITable } from 'form-dynamic-angular';
+import { IButtonsStandard, ICols, IForm, IOptions, ITable } from 'form-dynamic-angular';
 import { MessageService } from 'primeng/api';
 import { FormService } from '../service/form.service';
 
@@ -25,6 +25,11 @@ export class FormComponent {
   ]
 
   table: ITable[] = []
+  cols: ICols[] = [
+    { field: 'c1', header: 'Tipo de Aprovador' },
+    { field: 'c2', header: 'Usuário/Cargo' },
+    { field: 'button', header: 'Ação' },
+  ]
 
   options: IOptions[] = [
     { id: 1, descricao: "Usuário" },
@@ -64,11 +69,11 @@ export class FormComponent {
 
     this.form = [
       { label: 'Nome', col: 'col-lg-6', type: 'text', formControl: 'descricao' },
-      { label: 'HIerarquia de Aprovação', col: 'col-md-12' },
-      { label: 'Tipo de usuário', col: 'col-md-4', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view" },
-      { label: 'Usuário/Cargo', col: 'col-md-4', type: 'select', formControl: 'name', disabled: this.type == "view" },
-      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-4', type: 'button', class: "mt-3", formControl: 'aprovacao', disabled: this.type == "view" },
-      { label: '', col: 'col-md-12', type: 'table', formControl: '', tableOptions: this.table },
+      { label: 'Hierarquia de Aprovação', col: 'col-md-12' },
+      { label: 'Tipo de Aprovador', col: 'col-md-2', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view" },
+      { label: 'Usuário/Cargo', col: 'col-md-8', type: 'select', formControl: 'name', disabled: this.type == "view" },
+      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", formControl: 'aprovacao', disabled: this.type == "view" },
+      { label: '', col: 'col-md-12', type: 'table', formControl: '', rowsTable: this.table, colsTable: this.cols },
     ]
     if (this.id) {
       this.title = "Editar"
@@ -76,7 +81,7 @@ export class FormComponent {
         var form = data as any
         console.log('form', form)
         this.control = this.fb.group(form[0])
-        this.form[5].tableOptions = form[0].table
+        this.form[5].rowsTable = form[0].table
       })
     }
   }

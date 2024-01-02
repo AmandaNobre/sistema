@@ -7,6 +7,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-form-request',
+  styleUrls: ['./form.component.css'],
   templateUrl: './form.component.html'
 })
 
@@ -18,7 +19,9 @@ export class FormComponent {
     form: '',
     t1: '',
     t2: '',
-    t3: ''
+    t3: '',
+    t4: '',
+    t5: ''
   })
 
   controlReject: UntypedFormGroup = this.fb.group({
@@ -74,7 +77,9 @@ export class FormComponent {
           form: form[0].formResponse.form,
           t1: new FormControl({ value: form[0].formResponse.t1, disabled: this.type == "view" }),
           t2: new FormControl({ value: form[0].formResponse.t2, disabled: this.type == "view" }),
-          t3: new FormControl({ value: form[0].formResponse.t3, disabled: this.type == "view" })
+          t3: new FormControl({ value: form[0].formResponse.t3, disabled: this.type == "view" }),
+          t4: new FormControl({ value: form[0].formResponse.t4, disabled: this.type == "view" }),
+          t5: new FormControl({ value: form[0].formResponse.t5, disabled: this.type == "view" })
         })
         this.chageValues()
       })
@@ -153,7 +158,9 @@ export class FormComponent {
   chageValues() {
     if (this.control.value.form) {
       this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-12', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
+        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" },
+        { label: '', col: 'col-lg-6', formControl: 'form' }
+        
       ]
       var form = this.control.value.form
       if (form.id == 2) {
@@ -163,9 +170,11 @@ export class FormComponent {
         )
       } else if (form.id == 1) {
         this.form.push(
-          { label: 'Tipo de Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't1', disabled: this.type == "view" },
-          { label: 'Motivo do Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't2', disabled: this.type == "view" },
-          { label: 'Email: ', col: 'col-lg-12', type: 'text', formControl: 't3', disabled: this.type == "view" },
+          { label: 'Período: ', col: 'col-lg-2', type: 'date', formControl: 't4', disabled: this.type == "view" ? true : null },
+          { label: '', col: 'col-lg-2', type: 'date', formControl: 't5', disabled: this.type == "view" ? true : null },
+          { label: 'Tipo de Acesso: ', col: 'col-lg-12', type: 'text-area', formControl: 't1', disabled: this.type == "view" ? true : null },
+          { label: 'Motivo do Acesso: ', col: 'col-lg-12', type: 'text-area', formControl: 't2', disabled: this.type == "view" ? true : null },
+          { label: 'Lista de Acessos', col: 'col-lg-12', type: 'radio-button', formControl: 'form', disabled: this.type == "view" ? true : null, options: [{ descricao: 'Internet', id: 'true' }, { descricao: 'Intranet', id: 'false' }, { descricao: 'TOTVS', id: 'false' }] },
         )
       } else {
 
