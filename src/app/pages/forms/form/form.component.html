@@ -1,5 +1,12 @@
 <div class="page">
     <p-toast></p-toast>
     <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Formulário"
-        [form]=form [control]=control></form-dynamic-angular>
+        [form]=form [control]=control [validateForm]=validateForm></form-dynamic-angular>
+</div>
+
+<h2>Pré visualização</h2>
+
+<div class="page">
+    <form-dynamic-angular title="{{formName}}"
+        [form]=formCreated [control]=controlFormCreated></form-dynamic-angular>
 </div>

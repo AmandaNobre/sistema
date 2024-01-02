@@ -9,6 +9,10 @@ body {
     margin-bottom: 35px;
 }
 
+.p-inputswitch .p-inputswitch-slider{
+    background: #ced4da !important;
+}
+
 .p-toast {
     width: auto !important;
 }
