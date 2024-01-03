@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { IButtonsOptions, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
+import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../service/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -35,7 +35,7 @@ export class FormComponent {
   ]
 
   buttonsStandard: IButtonsStandard[] = []
-  buttonsOptions: IButtonsOptions[] = []
+  buttonsOptional: IButtonsOptional[] = []
 
   buttonsStandardReject: IButtonsStandard[] = [
     { type: 'cancel', onCLick: () => this.return() },
@@ -87,7 +87,7 @@ export class FormComponent {
     }
 
     if (this.type == 'view') {
-      this.buttonsOptions = [
+      this.buttonsOptional = [
         // { label: "Voltar", icon: "pi pi-angle-left", onCLick: () => this.return(), styleClass: "p-button-warning" },
         { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-danger" },
         { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aprove(), styleClass: "p-button-success" },
