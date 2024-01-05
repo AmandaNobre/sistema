@@ -16,6 +16,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { DialogModule } from 'primeng/dialog';
 import { CalendarModule } from 'primeng/calendar';
+import { OrderListModule } from 'primeng/orderlist';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -29,6 +30,7 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    OrderListModule,
     ButtonModule,
     CalendarModule,
     DialogModule,

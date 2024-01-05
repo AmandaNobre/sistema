@@ -9,6 +9,7 @@
     <form *ngIf="controlNewForm" [formGroup]="controlNewForm" class="form-created">
         <div id="title">
             <h5>{{controlNewForm.value.titleForm}}</h5>
+            <h5>title</h5>
         </div>
         <div id="editTitle" class="editTitle">
             <input id="inputTitle" type="text" pInputText placeholder="Pergunta" class="w-100 form-control mb-3"
@@ -19,9 +20,18 @@
                 styleClass="p-button-text p-button-primary" label="Visualizar"></p-button>
         </div>
 
+        <p-orderList [value]="formCreated" [listStyle]="{ 'max-height': '30rem' }" header="Products" [dragdrop]="true">
+            <ng-template let-product pTemplate="item">
+                <div class="flex flex-wrap p-2 align-items-center gap-3">
+                    <a></a>
+                </div>
+            </ng-template>
+        </p-orderList>
+
         <div *ngFor="let form of formCreated; let i = index">
 
-            <p-button icon="pi pi-times" styleClass="p-button-text p-button-danger" class="buttons"></p-button>
+            <p-button icon="pi pi-times" styleClass="p-button-text p-button-danger" class="buttons"
+                (click)="removeInput(i)"></p-button>
 
             <input type="text" pInputText placeholder="Pergunta" class="w-100 form-control mb-3"
                 formControlName="question{{i}}" (change)="changeInput(i)" />
@@ -31,10 +41,12 @@
 
 
             <div *ngIf="controlNewForm.controls['list' + i]">
-                <div *ngFor="let list of controlNewForm.controls['list' + i]?.value; let index = index">
+                <div *ngFor="let list of controlNewForm.controls['list' + i]?.value; let index = index" class="d-flex">
                     <input *ngIf="form.type == 'select' || form.type == 'multi'" value="{{list.descricao}}"
                         type={{form.type}} pInputText placeholder="Opção" class="w-100 form-control"
-                        (change)="change($event, index, i)" formControlName="list" />
+                        (change)="change($event, index, i)" />
+                    <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger" class="buttons"
+                        (click)="removeOption(index, i)"></p-button>
                 </div>
             </div>
 

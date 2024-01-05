@@ -207,16 +207,20 @@ export class FormComponent {
   }
 
   addLocalStorage() {
-    localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
-    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
-    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    // localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
+    // localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    // localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
   }
 
   addInput(type: "date" | "number" | "select" | "text" | "upload-files") {
     const count = this.formCreated.length
 
+    const controlNewFormBefore = { ...this.controlNewForm.value }
+    const keys = Object.keys(controlNewFormBefore).filter((e) => e.startsWith("list"))
+    const control = keys.map((key: any) => ({ ...controlNewFormBefore, [key]: [controlNewFormBefore[key]] }))[0]
+
     this.controlNewForm = this.fb.group({
-      ...this.controlNewForm.value,
+      ...control,
       ["question" + count]: '',
       ["required" + count]: false,
       ["longAnswer" + count]: false,
@@ -274,8 +278,20 @@ export class FormComponent {
     this.formCreated[indexControl].options = change
 
     this.addLocalStorage()
-
   }
+
+
+  removeOption(index: number, indexControl: number) {
+    this.formCreated[indexControl].options?.splice(1, index)
+    this.addLocalStorage()
+  }
+
+
+  removeInput(index: number){
+    this.formCreated.splice(1, index)
+    this.addLocalStorage()
+  }
+
   changeInput(i: number) {
     const control = this.controlNewForm.value
     const nameFormControl = control["question" + i].normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
