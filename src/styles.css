@@ -69,6 +69,12 @@ body {
     padding: 20px 10px;
 }
 
+.buttons-form {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
 
 .drag-image {
     border: 1px dashed #000;
@@ -97,4 +103,12 @@ body {
 
 .drag-image i {
     font-size: 3rem;
+}
+
+.p-orderlist .p-orderlist-controls {
+    display: none;
+}
+
+.p-orderlist .p-orderlist-list .p-orderlist-item.p-highlight {
+    background: #F4F6F9 !important;
 }

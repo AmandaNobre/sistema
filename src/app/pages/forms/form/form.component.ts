@@ -19,14 +19,9 @@ export class FormComponent {
 
   validateForm: boolean = false
   control: UntypedFormGroup = this.fb.group({
-    descricao: new FormControl('', Validators.required),
+    // descricao: new FormControl('', Validators.required),
     type: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
-    name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
-    nameInput: this.tableInputs.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
-    typeInput: this.tableInputs.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
-    requiredInput: '',
-    optionForm: '',
-    generic: ''
+    name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl('')
   })
 
   form: IForm[] = []
@@ -98,6 +93,8 @@ export class FormComponent {
   ngOnInit() {
 
     $('#title').on("click", function () {
+      console.log("1")
+
       $('#title').hide();
       $('#editTitle').show();
     });
@@ -120,10 +117,14 @@ export class FormComponent {
     }
     if (controlNewFormLS) {
       const local = { ...JSON.parse(controlNewFormLS) }
+      console.log('local', local)
       const keys = Object.keys(local).filter((e) => e.startsWith("list"))
+      console.log('keys', keys)
       const control = keys.map((key: any) => ({ ...local, [key]: [local[key]] }))[0]
+      console.log('control', control)
       this.controlNewForm = this.fb.group(control)
     }
+    console.log('this.controlNewForm', this.controlNewForm)
 
     if (controlCreatedLS) {
       this.controlCreated = this.fb.group({
@@ -142,8 +143,8 @@ export class FormComponent {
     })
 
     this.form = [
-      { label: 'Nome do Formulário', col: 'col-lg-6', type: 'text', formControl: 'descricao', required: true },
-      { label: 'Hierarquia de Aprovação', col: 'col-md-12', formControl: 'generic' },
+      // { label: 'Nome do Formulário', col: 'col-lg-6', type: 'text', formControl: 'descricao', required: true },
+      // { label: 'Hierarquia de Aprovação', col: 'col-md-12', formControl: 'generic' },
       { label: 'Tipo de Aprovador', col: 'col-md-2', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view", required: true },
       { label: 'Usuário/Cargo', col: 'col-md-8', type: 'select', formControl: 'name', disabled: this.type == "view", required: true },
       { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" }
@@ -154,19 +155,21 @@ export class FormComponent {
       this.service.getById(this.id).subscribe(data => {
         var form = data as any
         this.control = this.fb.group(form[0])
-        this.form[5].rowsTable = form[0].table
+        // this.form[5].rowsTable = form[0].table
+        this.form[2].rowsTable = form[0].table
       })
     }
   }
 
   chageValues() {
-
     if (this.control.value.type.id == 1) {
-      this.form[3].options = this.user
+      // this.form[3].options = this.user
+      this.form[1].options = this.user
     }
 
     if (this.control.value.type.id == 2) {
-      this.form[3].options = this.cargos
+      // this.form[3].options = this.cargos
+      this.form[1].options = this.cargos
     }
   }
 
@@ -180,10 +183,15 @@ export class FormComponent {
         id: this.table.length + 1,
         button: { label: "", icon: "pi pi-trash", onCLick: (data: any) => this.removeList(data), styleClass: "p-button-danger p-button-outlined" },
       })
-      if (!this.form[5]) {
-        this.form[5] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+      // if (!this.form[5]) {
+      //   this.form[5] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+      // } else {
+      //   this.form[5].rowsTable = this.table
+      // }
+      if (!this.form[3]) {
+        this.form[3] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
       } else {
-        this.form[5].rowsTable = this.table
+        this.form[3].rowsTable = this.table
       }
       this.control = this.fb.group({
         ...control,
@@ -195,7 +203,8 @@ export class FormComponent {
 
   removeList(data: any) {
     this.table = this.table.filter(t => t.id !== data.id)
-    this.form[5].rowsTable = this.table
+    // this.form[5].rowsTable = this.table
+    this.form[3].rowsTable = this.table
 
     if (this.table.length === 0) {
       this.form.pop()
@@ -207,9 +216,9 @@ export class FormComponent {
   }
 
   addLocalStorage() {
-    // localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
-    // localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
-    // localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
+    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
   }
 
   addInput(type: "date" | "number" | "select" | "text" | "upload-files") {
@@ -217,7 +226,8 @@ export class FormComponent {
 
     const controlNewFormBefore = { ...this.controlNewForm.value }
     const keys = Object.keys(controlNewFormBefore).filter((e) => e.startsWith("list"))
-    const control = keys.map((key: any) => ({ ...controlNewFormBefore, [key]: [controlNewFormBefore[key]] }))[0]
+    const control = keys.length > 0 ? keys.map((key: any) => ({ ...controlNewFormBefore, [key]: [controlNewFormBefore[key]] }))[0] : controlNewFormBefore
+
 
     this.controlNewForm = this.fb.group({
       ...control,
@@ -282,13 +292,13 @@ export class FormComponent {
 
 
   removeOption(index: number, indexControl: number) {
-    this.formCreated[indexControl].options?.splice(1, index)
+    this.formCreated[indexControl].options?.splice(index, 1)
     this.addLocalStorage()
   }
 
 
-  removeInput(index: number){
-    this.formCreated.splice(1, index)
+  removeInput(index: number) {
+    this.formCreated.splice(index, 1)
     this.addLocalStorage()
   }
 
