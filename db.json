@@ -46,6 +46,64 @@
       "descricao": "",
       "table": [],
       "id": 5
+    },
+    {
+      "descricao": "",
+      "table": [
+        {
+          "c1": "Cargo",
+          "c2": "Coordenador",
+          "id": 1,
+          "button": {
+            "label": "",
+            "icon": "pi pi-trash",
+            "styleClass": "p-button-danger p-button-outlined"
+          }
+        }
+      ],
+      "id": 6
+    },
+    {
+      "descricao": "",
+      "table": [
+        {
+          "c1": "Usuário",
+          "c2": "José",
+          "id": 1,
+          "button": {
+            "label": "",
+            "icon": "pi pi-trash",
+            "styleClass": "p-button-danger p-button-outlined"
+          }
+        }
+      ],
+      "id": 7
+    },
+    {
+      "descricao": "",
+      "table": [
+        {
+          "c1": "Cargo",
+          "c2": "Gerente",
+          "id": 1,
+          "button": {
+            "label": "",
+            "icon": "pi pi-trash",
+            "styleClass": "p-button-danger p-button-outlined"
+          }
+        },
+        {
+          "c1": "Usuário",
+          "c2": "Maria",
+          "id": 2,
+          "button": {
+            "label": "",
+            "icon": "pi pi-trash",
+            "styleClass": "p-button-danger p-button-outlined"
+          }
+        }
+      ],
+      "id": 8
     }
   ],
   "requests": [

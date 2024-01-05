@@ -1,9 +1,12 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { IButtonsStandard, ICols, IForm, IOptions, ITable } from 'form-dynamic-angular';
-import { Header, MessageService } from 'primeng/api';
+import { IButtonsStandard, ICols, IForm, IOptions } from 'form-dynamic-angular';
+import { MessageService } from 'primeng/api';
 import { FormService } from '../service/form.service';
+import { TableModule } from 'primeng/table';
+
+declare var $: any;
 
 @Component({
   selector: 'app-form-request',
@@ -11,14 +14,16 @@ import { FormService } from '../service/form.service';
 })
 
 export class FormComponent {
+  table: any[] = []
+  tableInputs: any[] = []
 
   validateForm: boolean = false
   control: UntypedFormGroup = this.fb.group({
-    descricao: '',
-    type: '',
-    name: new FormControl('', Validators.required),
-    nameInput: '',
-    typeInput: '',
+    descricao: new FormControl('', Validators.required),
+    type: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
+    name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
+    nameInput: this.tableInputs.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
+    typeInput: this.tableInputs.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
     requiredInput: '',
     optionForm: '',
     generic: ''
@@ -27,7 +32,10 @@ export class FormComponent {
   form: IForm[] = []
 
   formName: string = ''
-  controlFormCreated: UntypedFormGroup = this.fb.group({})
+  controlNewForm: UntypedFormGroup = this.fb.group({
+    titleForm: 'Título do Formulário'
+  })
+  controlCreated: UntypedFormGroup = this.fb.group({})
   formCreated: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
@@ -35,14 +43,12 @@ export class FormComponent {
     { type: 'save', onCLick: () => this.saveRequest() }
   ]
 
-  table: any[] = []
   cols: ICols[] = [
     { field: 'c1', header: 'Tipo de Aprovador' },
     { field: 'c2', header: 'Usuário/Cargo' },
     { field: 'button', header: 'Ação' },
   ]
 
-  tableInputs: any[] = []
   colsInputs: ICols[] = [
     { field: 'name', header: "Nome" },
     { field: 'type', header: "tipo" },
@@ -57,14 +63,12 @@ export class FormComponent {
 
   optionsForm: IOptions[] = []
 
-  typesInputs: IOptions[] = [
-    { id: 'autocomplete', descricao: "Autocompletar" },
-    { id: 'date', descricao: "Data" },
-    { id: 'date-time', descricao: "Data e Hora" },
-    { id: 'number', descricao: "Número" },
-    { id: 'text', descricao: "Texto" },
-    { id: 'multi', descricao: "Seleção Múltipla" },
-    { id: 'upload-files', descricao: "Upload de arquivos" }
+  typesInputs = [
+    { label: "Data", command: () => this.addInput("date") },
+    { label: "Número", command: () => this.addInput("number") },
+    { label: "Texto", command: () => this.addInput("text") },
+    { label: "Seleção", command: () => this.addInput("select") },
+    { label: "Upload de arquivos", command: () => this.addInput("upload-files") }
   ]
 
   user: IOptions[] = []
@@ -74,7 +78,6 @@ export class FormComponent {
   type: string = ''
 
   title: string = "Cadastrar"
-
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
@@ -86,7 +89,48 @@ export class FormComponent {
     this.route.params.subscribe(params => this.type = params['type']);
   }
 
+  visible: boolean = false;
+
+  showDialog() {
+    this.visible = true;
+  }
+
   ngOnInit() {
+
+    $('#title').on("click", function () {
+      $('#title').hide();
+      $('#editTitle').show();
+    });
+
+    $(function () {
+      $("body").on("click", function (e: { target: any; }) {
+        document.getElementById('inputTitle')?.addEventListener('blur', function () {
+          $('#title').show();
+          $('#editTitle').hide();
+        });
+      });
+    })
+
+    const formCreatedLS = localStorage.getItem("formCreated")
+    const controlNewFormLS = localStorage.getItem("controlNewForm")
+    const controlCreatedLS = localStorage.getItem("controlNewForm")
+
+    if (formCreatedLS) {
+      this.formCreated = JSON.parse(formCreatedLS)
+    }
+    if (controlNewFormLS) {
+      const local = { ...JSON.parse(controlNewFormLS) }
+      const keys = Object.keys(local).filter((e) => e.startsWith("list"))
+      const control = keys.map((key: any) => ({ ...local, [key]: [local[key]] }))[0]
+      this.controlNewForm = this.fb.group(control)
+    }
+
+    if (controlCreatedLS) {
+      this.controlCreated = this.fb.group({
+        ...JSON.parse(controlCreatedLS)
+      })
+    }
+
     this.service.getAllUser().subscribe(data => {
       var user = data as IOptions[]
       this.user = user
@@ -102,11 +146,7 @@ export class FormComponent {
       { label: 'Hierarquia de Aprovação', col: 'col-md-12', formControl: 'generic' },
       { label: 'Tipo de Aprovador', col: 'col-md-2', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view", required: true },
       { label: 'Usuário/Cargo', col: 'col-md-8', type: 'select', formControl: 'name', disabled: this.type == "view", required: true },
-      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", formControl: 'generic', disabled: this.type == "view" },
-      { label: 'Nome do Campo', col: 'col-md-3', type: 'text', formControl: 'nameInput', disabled: this.type == "view", required: true },
-      { label: 'Tipo do campo', col: 'col-md-3', type: 'select', formControl: 'typeInput', disabled: this.type == "view", options: this.typesInputs, required: true },
-      { secondLabel: "Obrigatório", col: 'col-md-3', type: 'switch', formControl: 'requiredInput', disabled: this.type == "view", required: true },
-      { label: 'Adicionar', onCLick: () => this.addForm(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view", formControl: 'generic' },
+      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" }
     ]
 
     if (this.id) {
@@ -118,44 +158,6 @@ export class FormComponent {
       })
     }
   }
-
-  addForm() {
-    const control = this.control.value
-    const nameFormControl = control.nameInput.normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
-
-    if (control.nameInput && control.typeInput) {
-      this.tableInputs.push({
-        name: control.nameInput,
-        type: control.typeInput.descricao,
-        required: control.requiredInput ? "Sim" : "Não",
-        id: this.table.length + 1,
-        button: { label: "", icon: "pi pi-trash", onCLick: (id: number) => this.removeList(id), styleClass: "p-button-danger p-button-outlined" },
-      })
-      this.form[10].tableOptions = this.tableInputs
-      this.control = this.fb.group({
-        ...control,
-        nameInput: '',
-        typeInput: '',
-        required: false
-      })
-
-      this.controlFormCreated = this.fb.group({
-        ...this.controlFormCreated.value,
-        [nameFormControl]: ''
-      })
-
-      this.formCreated = [
-        ...this.formCreated,
-        { label: control.nameInput, type: control.typeInput.id, formControl: nameFormControl },
-      ]
-    }
-
-    if (this.form[10].type != "table") {
-      this.form[10] = { col: 'col-md-12', type: 'table', rowsTable: this.tableInputs, colsTable: this.colsInputs, formControl: 'generic', tableOptions: this.tableInputs }
-
-    }
-  }
-
 
   chageValues() {
 
@@ -178,29 +180,141 @@ export class FormComponent {
         id: this.table.length + 1,
         button: { label: "", icon: "pi pi-trash", onCLick: (data: any) => this.removeList(data), styleClass: "p-button-danger p-button-outlined" },
       })
-      this.form[5].tableOptions = this.table
+      if (!this.form[5]) {
+        this.form[5] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+      } else {
+        this.form[5].rowsTable = this.table
+      }
       this.control = this.fb.group({
         ...control,
         type: '',
         name: ''
       })
     }
-
-    if (this.form[5].type != "table") {
-      this.form[5] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols, tableOptions: this.table }
-    }
   }
 
-
   removeList(data: any) {
-    console.log('data', data)
-    this.form[5].tableOptions =  this.table.filter(t => t.id !== data.id)
-    console.log('this.form[5]', this.form[5])
-    console.log('this.table.filter(t => t.id !== data.id)', this.table.filter(t => t.id !== data.id))
+    this.table = this.table.filter(t => t.id !== data.id)
+    this.form[5].rowsTable = this.table
+
+    if (this.table.length === 0) {
+      this.form.pop()
+    }
   }
 
   clickNew() {
     this.router.navigate([`register`], { relativeTo: this.route })
+  }
+
+  addLocalStorage() {
+    localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
+    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+  }
+
+  addInput(type: "date" | "number" | "select" | "text" | "upload-files") {
+    const count = this.formCreated.length
+
+    this.controlNewForm = this.fb.group({
+      ...this.controlNewForm.value,
+      ["question" + count]: '',
+      ["required" + count]: false,
+      ["longAnswer" + count]: false,
+      ["dateTime" + count]: false,
+      ["multi" + count]: false,
+      ["list" + count]: [],
+    })
+
+    this.formCreated.push(
+      { col: 'col-lg-12', type: type }
+    )
+
+    this.addLocalStorage()
+  }
+
+  changeTitle() {
+    this.controlCreated = this.fb.group({
+      ...this.controlCreated.value,
+      titleForm: this.controlNewForm.value.titleForm,
+    })
+    this.addLocalStorage()
+  }
+
+
+  addOptionsSelect(i: number) {
+    let newValue = []
+    if (this.controlNewForm.controls["list" + i].value) {
+      newValue = [
+        ...this.controlNewForm.controls["list" + i].value,
+        { id: '', descricao: "" }
+      ]
+    } else {
+      newValue = [
+        { id: '', descricao: "" }
+      ]
+    }
+    this.controlNewForm.controls["list" + i].setValue(newValue)
+
+    this.formCreated[i].options = newValue
+
+    this.addLocalStorage()
+  }
+
+
+  change(e: any, index: number, indexControl: number) {
+
+    let change = this.controlNewForm.controls["list" + indexControl].value
+
+    const value = e.target.value
+    const id = value.normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
+
+    change[index] = { id: id, descricao: value }
+
+    this.controlNewForm.controls["list" + indexControl].setValue(change)
+    this.formCreated[indexControl].options = change
+
+    this.addLocalStorage()
+
+  }
+  changeInput(i: number) {
+    const control = this.controlNewForm.value
+    const nameFormControl = control["question" + i].normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
+
+    this.controlCreated = this.fb.group({
+      ...this.controlCreated.value,
+      [nameFormControl]: '',
+    })
+
+    this.formCreated[i].label = control["question" + i]
+    this.formCreated[i].formControl = nameFormControl
+    this.formCreated[i].required = control["required" + i]
+
+    if (this.formCreated[i].type == "text" || this.formCreated[i].type == "text-area") {
+      if (control["longAnswer" + i]) {
+        this.formCreated[i].type = 'text-area'
+      } else {
+        this.formCreated[i].type = 'text'
+      }
+    }
+
+
+    if (this.formCreated[i].type == "select" || this.formCreated[i].type == "multi") {
+      if (control["multi" + i]) {
+        this.formCreated[i].type = 'multi'
+      } else {
+        this.formCreated[i].type = 'select'
+      }
+    }
+
+    if (this.formCreated[i].type == "date" || this.formCreated[i].type == "date-time") {
+      if (control["dateTime" + i]) {
+        this.formCreated[i].type = 'date-time'
+      } else {
+        this.formCreated[i].type = 'date'
+      }
+    }
+
+    this.addLocalStorage()
   }
 
   saveRequest() {
@@ -234,6 +348,6 @@ export class FormComponent {
 
   return() {
     this.router.navigate([`/pages/forms`], { relativeTo: this.route })
-
   }
+
 }

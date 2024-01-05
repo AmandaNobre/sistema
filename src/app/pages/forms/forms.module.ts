@@ -12,6 +12,10 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FormService } from './service/form.service';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { DialogModule } from 'primeng/dialog';
+import { CalendarModule } from 'primeng/calendar';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -25,6 +29,11 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    ButtonModule,
+    CalendarModule,
+    DialogModule,
+    InputSwitchModule,
+    SplitButtonModule,
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
