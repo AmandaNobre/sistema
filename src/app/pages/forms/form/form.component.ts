@@ -80,8 +80,8 @@ export class FormComponent {
     private service: FormService,
     private messageService: MessageService
   ) {
-    this.route.params.subscribe(params => this.id = params['id']);
-    this.route.params.subscribe(params => this.type = params['type']);
+    this.route.params.subscribe((params: { [x: string]: number; }) => this.id = params['id']);
+    this.route.params.subscribe((params: { [x: string]: string; }) => this.type = params['type']);
   }
 
   visible: boolean = false;
@@ -93,8 +93,6 @@ export class FormComponent {
   ngOnInit() {
 
     $('#title').on("click", function () {
-      console.log("1")
-
       $('#title').hide();
       $('#editTitle').show();
     });
@@ -117,14 +115,10 @@ export class FormComponent {
     }
     if (controlNewFormLS) {
       const local = { ...JSON.parse(controlNewFormLS) }
-      console.log('local', local)
       const keys = Object.keys(local).filter((e) => e.startsWith("list"))
-      console.log('keys', keys)
       const control = keys.map((key: any) => ({ ...local, [key]: [local[key]] }))[0]
-      console.log('control', control)
       this.controlNewForm = this.fb.group(control)
     }
-    console.log('this.controlNewForm', this.controlNewForm)
 
     if (controlCreatedLS) {
       this.controlCreated = this.fb.group({
@@ -132,12 +126,12 @@ export class FormComponent {
       })
     }
 
-    this.service.getAllUser().subscribe(data => {
+    this.service.getAllUser().subscribe((data) => {
       var user = data as IOptions[]
       this.user = user
     })
 
-    this.service.getAllCargos().subscribe(data => {
+    this.service.getAllCargos().subscribe((data) => {
       var cargos = data as IOptions[]
       this.cargos = cargos
     })
@@ -152,7 +146,7 @@ export class FormComponent {
 
     if (this.id) {
       this.title = "Editar"
-      this.service.getById(this.id).subscribe(data => {
+      this.service.getById(this.id).subscribe((data ) => {
         var form = data as any
         this.control = this.fb.group(form[0])
         // this.form[5].rowsTable = form[0].table
@@ -256,20 +250,13 @@ export class FormComponent {
 
 
   addOptionsSelect(i: number) {
-    let newValue = []
-    if (this.controlNewForm.controls["list" + i].value) {
-      newValue = [
-        ...this.controlNewForm.controls["list" + i].value,
-        { id: '', descricao: "" }
-      ]
-    } else {
-      newValue = [
-        { id: '', descricao: "" }
-      ]
-    }
-    this.controlNewForm.controls["list" + i].setValue(newValue)
+    const initial = { id: '', descricao: "" }
 
-    this.formCreated[i].options = newValue
+    if (this.formCreated[i].options) {
+      this.formCreated[i].options?.push(initial)
+    } else {
+      this.formCreated[i].options = [initial]
+    }
 
     this.addLocalStorage()
   }
@@ -277,15 +264,15 @@ export class FormComponent {
 
   change(e: any, index: number, indexControl: number) {
 
-    let change = this.controlNewForm.controls["list" + indexControl].value
+    let change = this.formCreated[indexControl].options
 
     const value = e.target.value
     const id = value.normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
 
-    change[index] = { id: id, descricao: value }
-
-    this.controlNewForm.controls["list" + indexControl].setValue(change)
-    this.formCreated[indexControl].options = change
+    if (change) {
+      change[index] = { id: id, descricao: value }
+      this.formCreated[indexControl].options = change
+    }
 
     this.addLocalStorage()
   }

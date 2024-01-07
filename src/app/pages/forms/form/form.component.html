@@ -36,11 +36,9 @@
                                 [disabled]="true" />
 
 
-                            <div *ngIf="controlNewForm.controls['list' + indexForm]">
-                                <div *ngFor="let list of controlNewForm.controls['list' + indexForm]?.value; let index = index"
-                                    class="d-flex">
-                                    <input *ngIf="form.type == 'select' || form.type == 'multi'"
-                                        value="{{list.descricao}}" type={{form.type}} pInputText placeholder="Opção"
+                            <div *ngIf="form.type == 'select' || form.type == 'multi'">
+                                <div *ngFor="let list of formCreated[indexForm]?.options; let index = index" class="d-flex">
+                                    <input value="{{list.descricao}}" type={{form.type}} pInputText placeholder="Opção"
                                         class="w-100 form-control" (change)="change($event, index, indexForm)" />
                                     <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger"
                                         class="buttons" (click)="removeOption(index, indexForm)"></p-button>
