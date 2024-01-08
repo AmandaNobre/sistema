@@ -30,7 +30,6 @@ export class FormComponent {
   controlNewForm: UntypedFormGroup = this.fb.group({
     titleForm: 'Título do Formulário'
   })
-  controlCreated: UntypedFormGroup = this.fb.group({})
   formCreated: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
@@ -106,24 +105,36 @@ export class FormComponent {
       });
     })
 
-    const formCreatedLS = localStorage.getItem("formCreated")
-    const controlNewFormLS = localStorage.getItem("controlNewForm")
-    const controlCreatedLS = localStorage.getItem("controlNewForm")
 
-    if (formCreatedLS) {
-      this.formCreated = JSON.parse(formCreatedLS)
-    }
-    if (controlNewFormLS) {
-      const local = { ...JSON.parse(controlNewFormLS) }
-      const keys = Object.keys(local).filter((e) => e.startsWith("list"))
-      const control = keys.map((key: any) => ({ ...local, [key]: [local[key]] }))[0]
-      this.controlNewForm = this.fb.group(control)
-    }
+    if (this.id) {
+      this.title = "Editar"
+      this.service.getById(this.id).subscribe((data) => {
+        var form = data as any
+        // this.control = this.fb.group(form[0])
+        this.table = form[0].table
+        this.form[3] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+        this.controlNewForm = this.fb.group(form[0].controlCreatedForm)
+        this.formCreated = form[0].form
 
-    if (controlCreatedLS) {
-      this.controlCreated = this.fb.group({
-        ...JSON.parse(controlCreatedLS)
+        this.control = this.fb.group({
+          // descricao: new FormControl('', Validators.required),
+          type: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
+          name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl('')
+        })
       })
+
+    } else {
+      const formCreatedLS = localStorage.getItem("formCreated")
+      const controlNewFormLS = localStorage.getItem("controlNewForm")
+      if (formCreatedLS) {
+        this.formCreated = JSON.parse(formCreatedLS)
+      }
+      if (controlNewFormLS) {
+        const local = { ...JSON.parse(controlNewFormLS) }
+        const keys = Object.keys(local).filter((e) => e.startsWith("list"))
+        const control = keys.map((key: any) => ({ ...local, [key]: [local[key]] }))[0]
+        this.controlNewForm = this.fb.group(control)
+      }
     }
 
     this.service.getAllUser().subscribe((data) => {
@@ -144,15 +155,7 @@ export class FormComponent {
       { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" }
     ]
 
-    if (this.id) {
-      this.title = "Editar"
-      this.service.getById(this.id).subscribe((data ) => {
-        var form = data as any
-        this.control = this.fb.group(form[0])
-        // this.form[5].rowsTable = form[0].table
-        this.form[2].rowsTable = form[0].table
-      })
-    }
+
   }
 
   chageValues() {
@@ -212,7 +215,6 @@ export class FormComponent {
   addLocalStorage() {
     localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
     localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
-    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
   }
 
   addInput(type: "date" | "number" | "select" | "text" | "upload-files") {
@@ -239,15 +241,6 @@ export class FormComponent {
 
     this.addLocalStorage()
   }
-
-  changeTitle() {
-    this.controlCreated = this.fb.group({
-      ...this.controlCreated.value,
-      titleForm: this.controlNewForm.value.titleForm,
-    })
-    this.addLocalStorage()
-  }
-
 
   addOptionsSelect(i: number) {
     const initial = { id: '', descricao: "" }
@@ -293,8 +286,8 @@ export class FormComponent {
     const control = this.controlNewForm.value
     const nameFormControl = control["question" + i].normalize('NFD').replace(/[\u0300-\u036f,\s]/g, "").toLowerCase()
 
-    this.controlCreated = this.fb.group({
-      ...this.controlCreated.value,
+    this.controlNewForm = this.fb.group({
+      ...this.controlNewForm.value,
       [nameFormControl]: '',
     })
 
@@ -334,10 +327,14 @@ export class FormComponent {
     if (this.control.status === "VALID") {
       this.validateForm = false
 
+
       var payload = {
-        descricao: this.control.value.descricao,
-        table: this.table
+        table: this.table,
+        title: this.controlNewForm.value.titleForm,
+        form: this.formCreated,
+        controlCreatedForm: this.controlNewForm.value
       }
+      localStorage.clear();
 
       if (this.id) {
         this.service.edit(payload, this.id).subscribe({

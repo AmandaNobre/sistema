@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../service/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -17,11 +17,6 @@ export class FormComponent {
 
   control: UntypedFormGroup = this.fb.group({
     form: '',
-    t1: '',
-    t2: '',
-    t3: '',
-    t4: '',
-    t5: ''
   })
 
   controlReject: UntypedFormGroup = this.fb.group({
@@ -29,8 +24,15 @@ export class FormComponent {
     description: ''
   })
 
-
   form: IForm[] = []
+
+  controlSelected: UntypedFormGroup = this.fb.group({})
+  formSelected: IForm[] = []
+
+  validateForm: boolean = false;
+
+  titleFormSelected: string = ''
+
   formmReject: IForm[] = [
     { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
     { label: 'Descrição: ', col: 'col-lg-12', type: 'text-area', formControl: 'description' },
@@ -63,8 +65,8 @@ export class FormComponent {
   }
 
   ngOnInit() {
-    this.service.getAllForms().subscribe(data => {
-      this.options = data as IOptions[]
+    this.service.getAllForms().subscribe((data: any) => {
+      this.options = data.map((r: { title: string, id: number }) => ({ id: r.id, descricao: r.title })) as IOptions[]
       this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
       ]
@@ -73,19 +75,11 @@ export class FormComponent {
     if (this.id) {
       this.service.getById(this.id).subscribe(data => {
         var form = data as any
-        this.control = this.fb.group({
-          form: form[0].formResponse.form,
-          t1: new FormControl({ value: form[0].formResponse.t1, disabled: this.type == "view" }),
-          t2: new FormControl({ value: form[0].formResponse.t2, disabled: this.type == "view" }),
-          t3: new FormControl({ value: form[0].formResponse.t3, disabled: this.type == "view" }),
-          t4: new FormControl({ value: form[0].formResponse.t4, disabled: this.type == "view" }),
-          t5: new FormControl({ value: form[0].formResponse.t5, disabled: this.type == "view" })
-        })
-        this.chageValues()
+        this.control.controls['form'].setValue(this.options.filter(o => o.descricao === form[0].type)[0])
+        this.chageValues(form[0].controlResponse)
       })
       this.title = "Editar"
-
-      if(this.type == "view"){
+      if (this.type == "view") {
         this.title = "Visualizar"
       }
 
@@ -155,31 +149,27 @@ export class FormComponent {
   }
 
 
-  chageValues() {
-    if (this.control.value.form) {
-      this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" },
-        { label: '', col: 'col-lg-6', formControl: 'form' }
-        
-      ]
-      var form = this.control.value.form
-      if (form.id == 2) {
-        this.form.push(
-          { label: 'Nome: ', col: 'col-lg-6', type: 'text', formControl: 't1', disabled: this.type == "view" },
-          { label: 'Descrição: ', col: 'col-lg-6', type: 'text', formControl: 't2', disabled: this.type == "view" },
-        )
-      } else if (form.id == 1) {
-        this.form.push(
-          { label: 'Período: ', col: 'col-lg-2', type: 'date', formControl: 't4', disabled: this.type == "view" ? true : null },
-          { label: '', col: 'col-lg-2', type: 'date', formControl: 't5', disabled: this.type == "view" ? true : null },
-          { label: 'Tipo de Acesso: ', col: 'col-lg-12', type: 'text-area', formControl: 't1', disabled: this.type == "view" ? true : null },
-          { label: 'Motivo do Acesso: ', col: 'col-lg-12', type: 'text-area', formControl: 't2', disabled: this.type == "view" ? true : null },
-          { label: 'Lista de Acessos', col: 'col-lg-12', type: 'radio-button', formControl: 'form', disabled: this.type == "view" ? true : null, options: [{ descricao: 'Internet', id: 'true' }, { descricao: 'Intranet', id: 'false' }, { descricao: 'TOTVS', id: 'false' }] },
-        )
-      } else {
+  chageValues(formResponse?: any) {
 
+    var control = this.control.value.form
+    this.service.getFormById(control.id).subscribe((data: any) => {
+      let formValid = {}
+      this.titleFormSelected = data.title
+      this.formSelected = data.form
+
+      if (formResponse) {
+        this.formSelected.map((form: any) => (
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl(formResponse[form.formControl], Validators.required) : new FormControl(formResponse[form.formControl]) })
+        ))
+      } else {
+        this.formSelected.map((form: any) => (
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl('', Validators.required) : new FormControl('') })
+        ))
       }
-    }
+
+      this.controlSelected = this.fb.group(formValid)
+    })
+
   }
 
   clickNew() {
@@ -187,32 +177,34 @@ export class FormComponent {
   }
 
   saveRequest() {
-    var payload = {
-      type: this.control.value.form.descricao,
-      formResponse: this.control.value,
-      user: "teste",
-      status: "Solicitada"
+    this.validateForm = true
+
+    if (this.controlSelected.status === "VALID") {
+      this.validateForm = false
+      var payload = {
+        type: this.control.value.form.descricao,
+        formResponse: this.formSelected,
+        controlResponse: this.controlSelected.value,
+        user: "teste",
+        status: "Solicitada"
+      }
+
+      if (this.id) {
+        this.service.editRequest(payload, this.id).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
+            setTimeout(() => this.return(), 2000);
+          }
+        })
+      } else {
+        this.service.saveRequest(payload).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
+            setTimeout(() => this.return(), 2000);
+          }
+        })
+      }
     }
-
-
-
-    if (this.id) {
-      this.service.editRequest(payload, this.id).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-          setTimeout(() => this.return(), 2000);
-        }
-      })
-    } else {
-      this.service.saveRequest(payload).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
-          setTimeout(() => this.return(), 2000);
-        }
-      })
-    }
-
-
   }
 
   return() {

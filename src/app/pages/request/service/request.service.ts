@@ -9,6 +9,11 @@ export class RequestService {
     return this.http.get(`http://localhost:3000/forms`);
   }
 
+
+  getFormById(id: number) {
+    return this.http.get(`http://localhost:3000/forms/${id}`);
+  }
+
   filter(type: string){
     return this.http.get(`http://localhost:3000/requests?type=${type}`)
   }
@@ -26,7 +31,6 @@ export class RequestService {
   }
 
   editRequest(payload: any, id: number) {
-    // console.log('payload', payload)
     return this.http.put(`http://localhost:3000/requests/${id}`, payload);
   }
 }

@@ -1,6 +1,6 @@
 <div class="page">
     <p-toast></p-toast>
-    <p-accordion [multiple]="true" [activeIndex]="[1]">
+    <p-accordion [multiple]="true" [activeIndex]="[0]">
         <p-accordionTab header="Hierarquia de Aprovação">
             <form-dynamic-angular (onChange)=chageValues() [form]=form [control]=control
                 [validateForm]=validateForm></form-dynamic-angular>
@@ -12,7 +12,7 @@
                 </div>
                 <div id="editTitle">
                     <input id="inputTitle" type="text" pInputText placeholder="Pergunta" class="w-100 form-control mb-3"
-                        formControlName="titleForm" (change)="changeTitle()" />
+                        formControlName="titleForm" />
                 </div>
                 <div class="d-flex justify-content-end">
                     <p-button *ngIf="formCreated.length > 0 " (click)="showDialog()" icon="pi pi-eye"
@@ -227,6 +227,6 @@
 
 <p-dialog [contentStyle]="{'overflow': 'visible'}" header="" [(visible)]="visible" [style]="{width: '50vw'}"
     [maximizable]="true">
-    <form-dynamic-angular *ngIf="formCreated.length > 0" title="{{controlCreated.value.titleForm}}" [form]=formCreated
-        [control]=controlCreated></form-dynamic-angular>
+    <form-dynamic-angular *ngIf="formCreated.length > 0" title="{{controlNewForm.value.titleForm}}" [form]=formCreated
+        [control]=controlNewForm></form-dynamic-angular>
 </p-dialog>

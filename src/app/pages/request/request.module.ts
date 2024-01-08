@@ -13,6 +13,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    DividerModule,
     TableModule,
     CommonModule,
     RouterModule.forChild(routes),

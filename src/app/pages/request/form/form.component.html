@@ -1,12 +1,35 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 <div class="page">
-    <p-toast></p-toast>
-    <p-confirmDialog></p-confirmDialog>
-    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Solicitação"
-        [form]=form [control]=control [buttonsOptional]=buttonsOptional></form-dynamic-angular>
-
-
-    <p-dialog  [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible" [style]="{ width: '90vw', height: '500px' }">
-        <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject
-            [form]=formmReject [control]=controlReject ></form-dynamic-angular>
+    <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
+        [control]=control></form-dynamic-angular>
+    <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
+        [style]="{ width: '90vw', height: '500px' }">
+        <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
+            [control]=controlReject></form-dynamic-angular>
     </p-dialog>
+</div>
+
+<div class="page" *ngIf="formSelected.length > 0">
+    <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" [form]=formSelected
+        [control]=controlSelected></form-dynamic-angular>
+</div>
+
+<p-divider></p-divider>
+
+<div class="buttons-form p-3">
+    <div *ngFor="let button of buttonsStandard">
+        <p-button *ngIf="button.type === 'clean'" styleClass="p-button-warning" label="Limpar"
+            (click)="button.onCLick()" icon="pi pi-times"></p-button>
+        <p-button *ngIf="button.type === 'filter'" label="Filtrar" (click)="button.onCLick()"
+            icon="pi pi-search"></p-button>
+        <p-button *ngIf="button.type === 'save'" styleClass="p-button-success" label="Salvar" (click)="button.onCLick()"
+            icon="pi pi-save"></p-button>
+        <p-button *ngIf="button.type === 'cancel'" styleClass="p-button-danger" label="Cancelar"
+            (click)="button.onCLick()" icon="pi pi-times"></p-button>
+    </div>
+    <div *ngFor="let button of buttonsOptional">
+        <p-button styleClass={{button.styleClass}} label={{button.label}} (click)=" button.onCLick()"
+            icon={{button.icon}}></p-button>
+    </div>
 </div>

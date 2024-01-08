@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';import { ConfirmationService, MessageService } from 'primeng/api';
+import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular'; import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormService } from '../service/form.service';
 
 @Component({
@@ -43,12 +43,12 @@ export class ListComponent implements OnInit {
     ]
 
     this.cols = [
-      { field: 'descricao', header: 'Nome' },
+      { field: 'title', header: 'Nome' },
     ];
 
     this.service.getAllForms().subscribe(data => {
-      this.requests = data as IOptions[]
-      this.form[0].options = this.requests
+      this.requests = data as any[]
+      this.form[0].options = this.requests.map(r => ({ ...r, descricao: r.title }))
     })
   }
 

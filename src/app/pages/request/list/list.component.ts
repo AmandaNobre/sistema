@@ -24,7 +24,7 @@ export class ListComponent implements OnInit {
   cols: any[] = []
   requests: any[] = []
 
- 
+
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -32,15 +32,16 @@ export class ListComponent implements OnInit {
     private router: Router,
     private service: RequestService
   ) {
- 
+
   }
 
   ngOnInit() {
 
     this.service.getAllForms().subscribe(data => {
 
+      const dataOptions = data as any[]
       this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: data as IOptions[], formControl: 'form' }
+        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: dataOptions.map(r => ({ ...r, descricao: r.title })) as IOptions[], formControl: 'form' }
       ]
     })
 
