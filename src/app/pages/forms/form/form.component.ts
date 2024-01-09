@@ -3,8 +3,10 @@ import { Component } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IButtonsStandard, ICols, IForm, IOptions } from 'form-dynamic-angular';
 import { MessageService } from 'primeng/api';
-import { FormService } from '../service/form.service';
+import { FormService } from '../../../services/form.service';
 import { TableModule } from 'primeng/table';
+import { IDataForm, IDataFormById, IDataUser } from 'src/app/interface';
+import { UserService } from '../../../services/user.service';
 
 declare var $: any;
 
@@ -68,18 +70,19 @@ export class FormComponent {
   user: IOptions[] = []
   cargos: IOptions[] = []
 
-  id: number = 0
+  id: string = ''
   type: string = ''
 
   title: string = "Cadastrar"
   constructor(
+    private messageService: MessageService,
+    private formService: FormService,
+    private userService: UserService,
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: FormService,
-    private messageService: MessageService
   ) {
-    this.route.params.subscribe((params: { [x: string]: number; }) => this.id = params['id']);
+    this.route.params.subscribe((params: { [x: string]: number; }) => this.id = params['id'].toString());
     this.route.params.subscribe((params: { [x: string]: string; }) => this.type = params['type']);
   }
 
@@ -108,16 +111,13 @@ export class FormComponent {
 
     if (this.id) {
       this.title = "Editar"
-      this.service.getById(this.id).subscribe((data) => {
-        var form = data as any
-        // this.control = this.fb.group(form[0])
-        this.table = form[0].table
-        this.form[3] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
-        this.controlNewForm = this.fb.group(form[0].controlCreatedForm)
-        this.formCreated = form[0].form
+      this.formService.getById(this.id).subscribe(({ data }: IDataFormById) => {
+        // this.table = form[0].table
+        // this.form[3] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+        this.controlNewForm = this.fb.group(JSON.parse(data.controlCreatedForm))
+        this.formCreated = JSON.parse(data.form)
 
         this.control = this.fb.group({
-          // descricao: new FormControl('', Validators.required),
           type: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
           name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl('')
         })
@@ -137,35 +137,28 @@ export class FormComponent {
       }
     }
 
-    this.service.getAllUser().subscribe((data) => {
-      var user = data as IOptions[]
-      this.user = user
+    this.userService.getAll().subscribe(({ data }: IDataUser) => {
+      const users: Array<IOptions> = data.map(d => ({ descricao: d.name, id: d.id }))
+      this.user = users
     })
 
-    this.service.getAllCargos().subscribe((data) => {
+    this.formService.getAllCargos().subscribe((data) => {
       var cargos = data as IOptions[]
       this.cargos = cargos
     })
 
-    this.form = [
-      // { label: 'Nome do Formulário', col: 'col-lg-6', type: 'text', formControl: 'descricao', required: true },
-      // { label: 'Hierarquia de Aprovação', col: 'col-md-12', formControl: 'generic' },
-      { label: 'Tipo de Aprovador', col: 'col-md-2', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view", required: true },
-      { label: 'Usuário/Cargo', col: 'col-md-8', type: 'select', formControl: 'name', disabled: this.type == "view", required: true },
-      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" }
+    this.form = [{ label: 'Tipo de Aprovador', col: 'col-md-2', type: 'select', options: this.options, formControl: 'type', disabled: this.type == "view", required: true },
+    { label: 'Usuário/Cargo', col: 'col-md-8', type: 'select', formControl: 'name', disabled: this.type == "view", required: true },
+    { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" }
     ]
-
-
   }
 
   chageValues() {
     if (this.control.value.type.id == 1) {
-      // this.form[3].options = this.user
       this.form[1].options = this.user
     }
 
     if (this.control.value.type.id == 2) {
-      // this.form[3].options = this.cargos
       this.form[1].options = this.cargos
     }
   }
@@ -180,11 +173,6 @@ export class FormComponent {
         id: this.table.length + 1,
         button: { label: "", icon: "pi pi-trash", onCLick: (data: any) => this.removeList(data), styleClass: "p-button-danger p-button-outlined" },
       })
-      // if (!this.form[5]) {
-      //   this.form[5] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
-      // } else {
-      //   this.form[5].rowsTable = this.table
-      // }
       if (!this.form[3]) {
         this.form[3] = { label: '', col: 'col-md-12', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
       } else {
@@ -327,24 +315,23 @@ export class FormComponent {
     if (this.control.status === "VALID") {
       this.validateForm = false
 
-
       var payload = {
-        table: this.table,
         title: this.controlNewForm.value.titleForm,
-        form: this.formCreated,
-        controlCreatedForm: this.controlNewForm.value
+        form: JSON.stringify(this.formCreated),
+        controlCreatedForm: JSON.stringify(this.controlNewForm.value)
       }
+
       localStorage.clear();
 
       if (this.id) {
-        this.service.edit(payload, this.id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar formulário' });
-            setTimeout(() => this.return(), 2000);
-          }
-        })
+        // this.formService.edit(payload, this.id).subscribe({
+        //   next: () => {
+        //     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar formulário' });
+        //     setTimeout(() => this.return(), 2000);
+        //   }
+        // })
       } else {
-        this.service.save(payload).subscribe({
+        this.formService.save(payload).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar formulário' });
             setTimeout(() => this.return(), 2000);

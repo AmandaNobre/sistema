@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ListComponent } from './list/list.component';
 import { FormComponent } from './form/form.component';
-import { RequestService } from './service/request.service';
+import { RequestService } from '../../services/request.service';
 import { FormDynamicAngularModule } from 'form-dynamic-angular';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
+import { FormService } from 'src/app/services/form.service';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -46,7 +47,8 @@ const routes: Routes = [
   providers: [
     RequestService,
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    FormService
   ]
 })
 export class RequestModule { }

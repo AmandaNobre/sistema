@@ -2,8 +2,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { RequestService } from '../../../services/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { IDataForm, IDataFormById, IRequisition } from 'src/app/interface';
+import { FormService } from 'src/app/services/form.service';
 
 @Component({
   selector: 'app-form-request',
@@ -56,26 +58,27 @@ export class FormComponent {
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService,
+    private requestService: RequestService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private formService: FormService
   ) {
     this.route.params.subscribe(params => this.id = params['id']);
     this.route.params.subscribe(params => this.type = params['type']);
   }
 
   ngOnInit() {
-    this.service.getAllForms().subscribe((data: any) => {
-      this.options = data.map((r: { title: string, id: number }) => ({ id: r.id, descricao: r.title })) as IOptions[]
+    this.formService.getAll().subscribe(({ data }: IDataForm) => {
+      this.options = data.map(d => ({ ...d, descricao: d.title }))
       this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
       ]
     })
 
     if (this.id) {
-      this.service.getById(this.id).subscribe(data => {
+      this.requestService.getById(this.id).subscribe(data => {
         var form = data as any
-        this.control.controls['form'].setValue(this.options.filter(o => o.descricao === form[0].type)[0])
+        this.control.controls['form'].setValue(this.options.filter(o => o.id === form[0].formId)[0])
         this.chageValues(form[0].controlResponse)
       })
       this.title = "Editar"
@@ -106,12 +109,11 @@ export class FormComponent {
   confirmReject() {
     var payload = {
       type: this.control.value.form.descricao,
-      formResponse: this.control.value,
       user: "teste",
       status: "Reprovada"
     }
 
-    this.service.editRequest(payload, this.id).subscribe({
+    this.requestService.editRequest(payload, this.id).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
         setTimeout(() => this.return(), 2000);
@@ -130,12 +132,11 @@ export class FormComponent {
       accept: () => {
         var payload = {
           type: this.control.value.form.descricao,
-          formResponse: this.control.value,
           user: "teste",
           status: "Aprovada"
         }
 
-        this.service.editRequest(payload, this.id).subscribe({
+        this.requestService.editRequest(payload, this.id).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
             setTimeout(() => this.return(), 2000);
@@ -150,12 +151,11 @@ export class FormComponent {
 
 
   chageValues(formResponse?: any) {
-
     var control = this.control.value.form
-    this.service.getFormById(control.id).subscribe((data: any) => {
+    this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
       let formValid = {}
       this.titleFormSelected = data.title
-      this.formSelected = data.form
+      this.formSelected = JSON.parse(data.form)
 
       if (formResponse) {
         this.formSelected.map((form: any) => (
@@ -181,23 +181,21 @@ export class FormComponent {
 
     if (this.controlSelected.status === "VALID") {
       this.validateForm = false
-      var payload = {
-        type: this.control.value.form.descricao,
-        formResponse: this.formSelected,
-        controlResponse: this.controlSelected.value,
-        user: "teste",
-        status: "Solicitada"
+      var payload: IRequisition = {
+        formId: this.control.value.form.id,
+        controlResponse: JSON.stringify(this.controlSelected.value),
+        approvers: ['f55cbd88-8e00-4709-b53a-758d585d7a56']
       }
 
       if (this.id) {
-        this.service.editRequest(payload, this.id).subscribe({
+        this.requestService.editRequest(payload, this.id).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
             setTimeout(() => this.return(), 2000);
           }
         })
       } else {
-        this.service.saveRequest(payload).subscribe({
+        this.requestService.save(payload).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
             setTimeout(() => this.return(), 2000);

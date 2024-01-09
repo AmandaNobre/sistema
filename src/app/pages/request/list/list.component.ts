@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { RequestService } from '../../../services/request.service';
+import { FormService } from 'src/app/services/form.service';
+import { IDataForm } from 'src/app/interface';
 
 @Component({
   selector: 'app-request',
@@ -30,29 +32,29 @@ export class ListComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService
+    private service: RequestService,
+    private formService: FormService
   ) {
 
   }
 
   ngOnInit() {
-
-    this.service.getAllForms().subscribe(data => {
-
-      const dataOptions = data as any[]
+    this.formService.getAll().subscribe(({ data }: IDataForm) => {
+      var options = data.map(d => ({ ...d, descricao: d.title }))
       this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: dataOptions.map(r => ({ ...r, descricao: r.title })) as IOptions[], formControl: 'form' }
+        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: options, formControl: 'form' }
       ]
     })
 
+
     this.cols = [
-      { field: 'type', header: 'Tipo de formulário' },
+      { field: 'title', header: 'Tipo de formulário' },
       { field: 'user', header: 'Usuário' },
       { field: 'status', header: 'Status' }
     ];
 
-    this.service.getAllRequests().subscribe(data => {
-      this.requests = data as any[]
+    this.service.getAllRequests().subscribe((data: any) => {
+      this.requests = data.map((d: any) => ({ ...d, title: d.form.title }))
     })
   }
 
