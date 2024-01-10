@@ -15,7 +15,7 @@ export class ListComponent implements OnInit {
   control: UntypedFormGroup = this.fb.group({
     form: '',
   })
-  
+
   form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
@@ -25,6 +25,7 @@ export class ListComponent implements OnInit {
 
   cols: any[] = []
   allForms: any[] = []
+  formsFIlter: any[] = []
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -33,7 +34,7 @@ export class ListComponent implements OnInit {
     private formService: FormService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.form = [
@@ -50,14 +51,13 @@ export class ListComponent implements OnInit {
   getAll() {
     this.formService.getAll().subscribe(({ data }: IDataForm) => {
       this.allForms = data
+      this.formsFIlter = data
       this.form[0].options = data.map(d => ({ ...d, descricao: d.title }))
     })
   }
 
   filter() {
-    // this.formService.filter(this.control.value.form.descricao).subscribe(data => {
-    //   this.allForms = data as IOptions[]
-    // })
+    this.formsFIlter = this.allForms.filter(a => a.id === this.control.value.form.id)
   }
 
   clickNew() {

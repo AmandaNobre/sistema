@@ -4,7 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { FormService } from 'src/app/services/form.service';
-import { IDataForm } from 'src/app/interface';
+import { IDataForm, IDataRequisition, IDataUser, IUser } from 'src/app/interface';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-request',
@@ -25,20 +26,23 @@ export class ListComponent implements OnInit {
 
   cols: any[] = []
   requests: any[] = []
-
-
+  requestsFilter: any[] = []
+  users: IUser[] = []
 
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private service: RequestService,
-    private formService: FormService
-  ) {
-
-  }
+    private formService: FormService,
+    private userService: UserService
+  ) { }
 
   ngOnInit() {
+    this.userService.getAll().subscribe(({ data }: IDataUser) => (
+      this.users = data
+    ))
+
     this.formService.getAll().subscribe(({ data }: IDataForm) => {
       var options = data.map(d => ({ ...d, descricao: d.title }))
       this.form = [
@@ -46,22 +50,26 @@ export class ListComponent implements OnInit {
       ]
     })
 
-
     this.cols = [
       { field: 'title', header: 'Tipo de formulário' },
       { field: 'user', header: 'Usuário' },
       { field: 'status', header: 'Status' }
     ];
 
-    this.service.getAllRequests().subscribe((data: any) => {
-      this.requests = data.map((d: any) => ({ ...d, title: d.form.title }))
+    this.service.getAll().subscribe(({ data }: IDataRequisition) => {
+      const requestAll = data.map((d) => (
+        {
+          ...d,
+          title: this.form[0].options?.filter(o => o.id === d.customFormId)[0]?.descricao,
+          user: this.users.filter(u => u.id == d.requesterId)[0]?.name
+        }))
+      this.requests = requestAll
+      this.requestsFilter = requestAll
     })
   }
 
   filter() {
-    this.service.filter(this.control.value.form.descricao).subscribe(data => {
-      this.requests = data as any[]
-    })
+    this.requestsFilter = this.requests.filter(r => r.customFormId === this.control.value.form.id)
   }
 
   clickNew() {

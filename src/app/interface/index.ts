@@ -18,7 +18,8 @@ export interface IDataUser {
 export default interface ISaveCustomForm {
     title: string,
     form: string,
-    controlCreatedForm: string
+    controlCreatedForm: string,
+    id: string
 }
 
 export interface IForm {
@@ -38,8 +39,37 @@ export interface IDataFormById {
 }
 
 // requisition
-export interface IRequisition {
+export interface IRequisitionSave {
+    requesterId: string,
     formId: string,
     controlResponse: string,
     approvers: Array<string>
+}
+
+
+export interface IRequisition {
+    requesterId: string,
+    customFormId: string,
+    controlResponse: string,
+    customFormSnapshot: string,
+    approvers: Array<string>,
+    status: number,
+    requester: string,
+    customForm: string,
+    id: string
+
+}
+
+export interface IDataRequisition {
+    data: Array<IRequisition>
+}
+
+export interface IDataRequisitionById {
+    data: IRequisition
+}
+
+export interface IAproveOrReject{
+    approverId: string,
+    requisitionId: string,
+    id: string 
 }

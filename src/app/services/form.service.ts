@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environment.ts/environments';
 import ISaveCustomForm, { IDataForm, IDataFormById } from '../interface';
+import { IForm } from 'form-dynamic-angular';
 
 
 
@@ -17,14 +18,6 @@ export class FormService {
     return this.http.delete(`${environment.api_url}/CustomForm`, { body: { id } });
   }
 
-  getAllCargos() {
-    return this.http.get(`http://localhost:3000/cargos`);
-  }
-
-  filter(type: string) {
-    return this.http.get(`http://localhost:3000/forms?descricao=${type}`)
-  }
-
   getById(id: string) {
     return this.http.get<IDataFormById>(`${environment.api_url}/CustomForm/GetById/${id}`)
   }
@@ -33,7 +26,7 @@ export class FormService {
     return this.http.post(`${environment.api_url}/CustomForm`, payload);
   }
 
-  edit(payload: any, id: number) {
-    return this.http.put(`http://localhost:3000/forms/${id}`, payload);
+  edit(payload: ISaveCustomForm) {
+    return this.http.put(`${environment.api_url}/CustomForm`, payload);
   }
 }

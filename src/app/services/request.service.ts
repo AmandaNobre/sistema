@@ -1,29 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IRequisition } from '../interface';
+import { IAproveOrReject, IDataRequisition, IDataRequisitionById, IRequisitionSave } from '../interface';
 import { environment } from 'src/environment.ts/environments';
 
 @Injectable()
 export class RequestService {
   constructor(public http: HttpClient) { }
 
-  filter(type: string) {
-    return this.http.get(`http://localhost:3000/requests?type=${type}`)
+  getById(id: string) {
+    return this.http.get<IDataRequisitionById>(`${environment.api_url}/Requisition/GetById/${id}`);
   }
 
-  getById(id: number) {
-    return this.http.get(`http://localhost:3000/requests?id=${id}&_expand=form`)
+  getAll() {
+    return this.http.get<IDataRequisition>(`${environment.api_url}/Requisition/GetAll`);
   }
 
-  getAllRequests() {
-    return this.http.get(`http://localhost:3000/requests?_expand=form`);
-  }
-
-  save(payload: IRequisition) {
+  save(payload: IRequisitionSave) {
     return this.http.post(`${environment.api_url}/Requisition/New`, payload);
   }
 
-  editRequest(payload: any, id: number) {
-    return this.http.put(`http://localhost:3000/requests/${id}`, payload);
+  approveOrReject(payload: IAproveOrReject, type: string) {
+    return this.http.put(`${environment.api_url}/Requisition/${type}`, payload);
   }
 }

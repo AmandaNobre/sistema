@@ -4,7 +4,7 @@ import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { IDataForm, IDataFormById, IRequisition } from 'src/app/interface';
+import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IRequisitionSave } from 'src/app/interface';
 import { FormService } from 'src/app/services/form.service';
 
 @Component({
@@ -14,7 +14,7 @@ import { FormService } from 'src/app/services/form.service';
 })
 
 export class FormComponent {
-  id: number = 0
+  id: string = ''
   type: string = ''
 
   control: UntypedFormGroup = this.fb.group({
@@ -38,7 +38,6 @@ export class FormComponent {
   formmReject: IForm[] = [
     { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
     { label: 'Descrição: ', col: 'col-lg-12', type: 'text-area', formControl: 'description' },
-
   ]
 
   buttonsStandard: IButtonsStandard[] = []
@@ -76,12 +75,10 @@ export class FormComponent {
     })
 
     if (this.id) {
-      this.requestService.getById(this.id).subscribe(data => {
-        var form = data as any
-        this.control.controls['form'].setValue(this.options.filter(o => o.id === form[0].formId)[0])
-        this.chageValues(form[0].controlResponse)
+      this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
+        this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
+        this.chageValues(JSON.parse(data.controlResponse))
       })
-      this.title = "Editar"
       if (this.type == "view") {
         this.title = "Visualizar"
       }
@@ -90,9 +87,9 @@ export class FormComponent {
 
     if (this.type == 'view') {
       this.buttonsOptional = [
-        // { label: "Voltar", icon: "pi pi-angle-left", onCLick: () => this.return(), styleClass: "p-button-warning" },
-        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-danger" },
-        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aprove(), styleClass: "p-button-success" },
+        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning" },
+        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success" },
+        { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger" },
       ]
     } else {
       this.buttonsStandard = [
@@ -107,44 +104,47 @@ export class FormComponent {
   }
 
   confirmReject() {
-    var payload = {
-      type: this.control.value.form.descricao,
-      user: "teste",
-      status: "Reprovada"
+    var payload: IAproveOrReject = {
+      id: this.id,
+      requisitionId: this.id,
+      approverId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14"
     }
 
-    this.requestService.editRequest(payload, this.id).subscribe({
+    this.requestService.approveOrReject(payload, "Reject").subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
         setTimeout(() => this.return(), 2000);
+      },
+      error: ({ error }) => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
       }
     })
   }
 
-  aprove() {
+  aproveOrCancel(type: string) {
     this.confirmationService.confirm({
-      message: 'Certeza que deseja aprovar solicitação',
+      message: `Certeza que deseja ${type} solicitação`,
       header: 'Confirmação',
       icon: 'pi pi-exclamation-triangle',
       rejectButtonStyleClass: "p-button-text",
       acceptLabel: "Sim",
       rejectLabel: "Não",
       accept: () => {
-        var payload = {
-          type: this.control.value.form.descricao,
-          user: "teste",
-          status: "Aprovada"
+        var payload: IAproveOrReject = {
+          id: this.id,
+          requisitionId: this.id,
+          approverId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14"
         }
 
-        this.requestService.editRequest(payload, this.id).subscribe({
+        this.requestService.approveOrReject(payload, type === "aprovar" ? "Approve" : "Cancel").subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
             setTimeout(() => this.return(), 2000);
+          },
+          error: ({ error }) => {
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
           }
         })
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Confirmação aprovada com sucesso!' });
-        setTimeout(() => this.return(), 2000);
-
       }
     });
   }
@@ -159,7 +159,7 @@ export class FormComponent {
 
       if (formResponse) {
         this.formSelected.map((form: any) => (
-          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl(formResponse[form.formControl], Validators.required) : new FormControl(formResponse[form.formControl]) })
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({value: formResponse[form.formControl], disabled: true}) })
         ))
       } else {
         this.formSelected.map((form: any) => (
@@ -168,7 +168,9 @@ export class FormComponent {
       }
 
       this.controlSelected = this.fb.group(formValid)
+      console.log('formValid', formValid)
     })
+
 
   }
 
@@ -181,27 +183,19 @@ export class FormComponent {
 
     if (this.controlSelected.status === "VALID") {
       this.validateForm = false
-      var payload: IRequisition = {
+      var payload: IRequisitionSave = {
+        requesterId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14",
         formId: this.control.value.form.id,
         controlResponse: JSON.stringify(this.controlSelected.value),
         approvers: ['f55cbd88-8e00-4709-b53a-758d585d7a56']
       }
 
-      if (this.id) {
-        this.requestService.editRequest(payload, this.id).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-            setTimeout(() => this.return(), 2000);
-          }
-        })
-      } else {
-        this.requestService.save(payload).subscribe({
-          next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
-            setTimeout(() => this.return(), 2000);
-          }
-        })
-      }
+      this.requestService.save(payload).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
+          setTimeout(() => this.return(), 2000);
+        }
+      })
     }
   }
 

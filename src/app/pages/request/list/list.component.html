@@ -18,7 +18,7 @@
 
     <div class="page">
 
-        <p-table styleClass="p-datatable-striped" [columns]="cols" [value]="requests"
+        <p-table styleClass="p-datatable-striped" [columns]="cols" [value]="requestsFilter"
             [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header" let-columns>
                 <tr>
@@ -34,8 +34,8 @@
                         {{ rowData[col.field] }}
                     </td>
                     <td style="text-align: center;">
-                        <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2"
-                            styleClass="p-button-warning " icon="pi pi-pencil" label="Editar"></p-button>
+                        <!-- <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2"
+                            styleClass="p-button-warning " icon="pi pi-pencil" label="Editar"></p-button> -->
                         <p-button (click)="editOrView( rowData['id'], 'view' )" icon="pi pi-eye"
                             styleClass="p-button-info " label="Visualizar"></p-button>
                     </td>

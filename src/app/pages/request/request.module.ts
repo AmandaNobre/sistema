@@ -15,6 +15,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { FormService } from 'src/app/services/form.service';
+import { UserService } from 'src/app/services/user.service';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -48,7 +49,8 @@ const routes: Routes = [
     RequestService,
     MessageService,
     ConfirmationService,
-    FormService
+    FormService,
+    UserService
   ]
 })
 export class RequestModule { }

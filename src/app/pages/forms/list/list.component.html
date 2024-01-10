@@ -19,7 +19,7 @@
     </div>
 
     <div class="page">
-        <p-table [columns]="cols" [value]="allForms" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table [columns]="cols" [value]="formsFIlter" [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header" let-columns>
                 <tr>
                     <th *ngFor="let col of columns">
