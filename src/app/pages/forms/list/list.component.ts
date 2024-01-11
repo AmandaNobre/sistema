@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular'; import { ConfirmationService, MessageService } from 'primeng/api';
+import { IButtonsOptional, IButtonsStandard, ICols, IForm, IOptions } from 'form-dynamic-angular'; import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormService } from '../../../services/form.service';
 import { IDataForm } from 'src/app/interface';
 
@@ -23,9 +23,16 @@ export class ListComponent implements OnInit {
     { type: 'filter', onCLick: () => this.filter() }
   ]
 
-  cols: any[] = []
+  cols: ICols[] = [
+    { field: 'title', header: 'Nome' }
+  ];
+
   allForms: any[] = []
-  formsFIlter: any[] = []
+  formsFIlter: any[] | null = null
+  buttonsTable: IButtonsOptional[] = [
+    { label: "Editar", icon: "pi pi-pencil", onCLick: (rowData: any) => this.editOrView(rowData['id'], 'edit'), styleClass: "p-button-warning mr-2" },
+    { label: "Excluir", icon: "pi pi-trash", onCLick: (rowData: any) => this.remove(rowData['id']), styleClass: "p-button-danger" }
+  ]
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -40,10 +47,6 @@ export class ListComponent implements OnInit {
     this.form = [
       { label: 'Nome', col: 'col-md-6', type: 'select', formControl: 'form' }
     ]
-
-    this.cols = [
-      { field: 'title', header: 'Nome' },
-    ];
 
     this.getAll()
   }

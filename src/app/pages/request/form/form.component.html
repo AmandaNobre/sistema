@@ -3,12 +3,35 @@
 <div class="page">
     <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
         [control]=control></form-dynamic-angular>
+
+    <!-- <form [formGroup]="controHierarchyr" class="form-created"> -->
+    <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="true">
+        <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
+            <div class="flex flex-wrap p-2 align-items-center gap-3">
+                {{hierarchy.titleDescription}}
+
+                <p-button (click)="op.toggle($event)" styleClass="p-button-text p-button-primary"
+                    icon="pi pi-plus"></p-button>
+                <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
+                    <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}" (onSelect)=" onChangevalues($event, indexHierarchy, op)"
+                        [suggestions]="filteredAutoComplete"
+                        (completeMethod)="filterAutoComplete($event)" [forceSelection]="false"
+                        dropdownMode="current" dataKey="id" field="name"></p-autoComplete>
+
+                </p-overlayPanel>
+            </div>
+        </ng-template>
+    </p-orderList>
+    <!-- </form> -->
+
+
     <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
         [style]="{ width: '90vw', height: '500px' }">
         <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
             [control]=controlReject></form-dynamic-angular>
     </p-dialog>
 </div>
+
 
 <div class="page" *ngIf="formSelected.length > 0">
     <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" [form]=formSelected

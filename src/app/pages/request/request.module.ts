@@ -16,6 +16,10 @@ import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { FormService } from 'src/app/services/form.service';
 import { UserService } from 'src/app/services/user.service';
+import { OrderListModule } from 'primeng/orderlist';
+import { DropdownModule } from 'primeng/dropdown';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -29,6 +33,10 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    AutoCompleteModule,
+    OverlayPanelModule,
+    DropdownModule,
+    OrderListModule,
     DividerModule,
     TableModule,
     CommonModule,

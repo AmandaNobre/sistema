@@ -4,8 +4,10 @@ import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IRequisitionSave } from 'src/app/interface';
+import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IDataUser, IRequisitionSave, IUser } from 'src/app/interface';
 import { FormService } from 'src/app/services/form.service';
+import { UserService } from 'src/app/services/user.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-form-request',
@@ -16,7 +18,7 @@ import { FormService } from 'src/app/services/form.service';
 export class FormComponent {
   id: string = ''
   type: string = ''
-
+  hierarchy: any = []
   control: UntypedFormGroup = this.fb.group({
     form: '',
   })
@@ -25,6 +27,8 @@ export class FormComponent {
     files: '',
     description: ''
   })
+
+  filteredAutoComplete: any[] = [];
 
   form: IForm[] = []
 
@@ -49,9 +53,9 @@ export class FormComponent {
   ]
 
   options: IOptions[] = []
-
   visible: boolean = false
   title: string = "Cadastrar"
+  users: IUser[] = []
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -60,13 +64,40 @@ export class FormComponent {
     private requestService: RequestService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private formService: FormService
+    private formService: FormService,
+    private userService: UserService
   ) {
     this.route.params.subscribe(params => this.id = params['id']);
     this.route.params.subscribe(params => this.type = params['type']);
   }
+  filterAutoComplete(event: { query: any; }) {
+    let filtered: any[] = [];
+    let query = event.query;
+
+    if (this.users) {
+      for (let i = 0; i < this.users.length; i++) {
+        let dados = this.users[i];
+        if (dados.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+          filtered.push(dados);
+        }
+      }
+
+      this.filteredAutoComplete = filtered;
+    }
+  }
+
+  onChangevalues(event: any, index: any, op: OverlayPanel) {
+    console.log('index', index)
+    console.log('event', event)
+    op.hide();
+
+  }
 
   ngOnInit() {
+    this.userService.getAll().subscribe(({ data }: IDataUser) => (
+      this.users = data
+    ))
+
     this.formService.getAll().subscribe(({ data }: IDataForm) => {
       this.options = data.map(d => ({ ...d, descricao: d.title }))
       this.form = [
@@ -77,7 +108,7 @@ export class FormComponent {
     if (this.id) {
       this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
         this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
-        this.chageValues(JSON.parse(data.controlResponse))
+        this.chageValues(data.controlResponse)
       })
       if (this.type == "view") {
         this.title = "Visualizar"
@@ -152,14 +183,15 @@ export class FormComponent {
 
   chageValues(formResponse?: any) {
     var control = this.control.value.form
+    console.log('control', control)
     this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
       let formValid = {}
       this.titleFormSelected = data.title
-      this.formSelected = JSON.parse(data.form)
-
+      this.formSelected = data.form
+      this.hierarchy = data.hierarchy
       if (formResponse) {
         this.formSelected.map((form: any) => (
-          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({value: formResponse[form.formControl], disabled: true}) })
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({ value: formResponse[form.formControl], disabled: true }) })
         ))
       } else {
         this.formSelected.map((form: any) => (
@@ -168,9 +200,7 @@ export class FormComponent {
       }
 
       this.controlSelected = this.fb.group(formValid)
-      console.log('formValid', formValid)
     })
-
 
   }
 

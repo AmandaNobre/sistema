@@ -1,0 +1,43 @@
+<p-table *ngIf="rows" [columns]="cols" [value]="rows" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header" let-columns>
+        <tr>
+            <th *ngFor="let col of columns">
+                {{ col.header }}
+            </th>
+            <th *ngIf="buttonsOptional.length > 0">Ações</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+            <td *ngFor="let col of columns">
+                {{ rowData[col.field] }}
+            </td>
+            <td>
+                <p-button *ngFor="let button of buttonsOptional" styleClass={{button.styleClass}} label={{button.label}}
+                    (click)=" button.onCLick(rowData)" icon={{button.icon}}></p-button>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+
+<p-table *ngIf="!rows" [columns]="cols" [value]="rowsSkeleton" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header" let-columns>
+        <tr>
+            <th *ngFor="let col of columns">
+                {{ col.header }}
+            </th>
+            <th *ngIf="buttonsOptional.length > 0">Ações</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+            <td *ngFor="let col of columns">
+                <p-skeleton></p-skeleton>
+            </td>
+            <td *ngIf="buttonsOptional.length > 0">
+                <p-skeleton></p-skeleton>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

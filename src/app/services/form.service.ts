@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environment.ts/environments';
-import ISaveCustomForm, { IDataForm, IDataFormById } from '../interface';
-import { IForm } from 'form-dynamic-angular';
+import { IDataForm, IDataFormById, ISaveCustomForm } from '../interface';
 
 
 
