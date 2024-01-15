@@ -8,15 +8,17 @@
     <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="true">
         <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
             <div class="flex flex-wrap p-2 align-items-center gap-3">
-                {{hierarchy.titleDescription}}
 
-                <p-button (click)="op.toggle($event)" styleClass="p-button-text p-button-primary"
-                    icon="pi pi-plus"></p-button>
+                <label>{{hierarchy.titleDescription}}</label> {{hierarchy.name}}
+                <p-button *ngIf="!hierarchy.name" (click)="op.toggle($event)"
+                    styleClass="p-button-text p-button-primary" icon="pi pi-plus"></p-button>
+                <p-button *ngIf="hierarchy.name" (click)="op.toggle($event)" styleClass="p-button-text p-button-primary"
+                    icon="pi pi-pencil"></p-button>
                 <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
-                    <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}" (onSelect)=" onChangevalues($event, indexHierarchy, op)"
-                        [suggestions]="filteredAutoComplete"
-                        (completeMethod)="filterAutoComplete($event)" [forceSelection]="false"
-                        dropdownMode="current" dataKey="id" field="name"></p-autoComplete>
+                    <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}"
+                        (onSelect)=" onChangevalues($event, indexHierarchy, op)" [suggestions]="filteredAutoComplete"
+                        (completeMethod)="filterAutoComplete($event)" [forceSelection]="false" dropdownMode="current"
+                        dataKey="id" field="name"></p-autoComplete>
 
                 </p-overlayPanel>
             </div>
@@ -34,8 +36,8 @@
 
 
 <div class="page" *ngIf="formSelected.length > 0">
-    <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" [form]=formSelected
-        [control]=controlSelected></form-dynamic-angular>
+    <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}"
+        description="{{descriptionFormSelected}}" [form]=formSelected [control]=controlSelected></form-dynamic-angular>
 </div>
 
 <p-divider></p-divider>
@@ -56,3 +58,5 @@
             icon={{button.icon}}></p-button>
     </div>
 </div>
+
+<p-confirmDialog ></p-confirmDialog>

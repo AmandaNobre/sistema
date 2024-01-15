@@ -9,7 +9,7 @@ import { TableCustomComponent } from './table-custom/table-custom.component';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
-
+import { PaginatorModule } from 'primeng/paginator';
 @NgModule({
   declarations: [
     AppheaderComponent,
@@ -18,6 +18,7 @@ import { SkeletonModule } from 'primeng/skeleton';
     TableCustomComponent
   ],
   imports: [
+    PaginatorModule,
     SkeletonModule,
     ButtonModule,
     TableModule,

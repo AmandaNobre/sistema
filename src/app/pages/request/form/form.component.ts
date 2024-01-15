@@ -38,6 +38,8 @@ export class FormComponent {
   validateForm: boolean = false;
 
   titleFormSelected: string = ''
+  descriptionFormSelected: string = ''
+  sigleFormSelected: string = ''
 
   formmReject: IForm[] = [
     { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
@@ -87,10 +89,8 @@ export class FormComponent {
   }
 
   onChangevalues(event: any, index: any, op: OverlayPanel) {
-    console.log('index', index)
-    console.log('event', event)
+    this.hierarchy[index] = { ...this.hierarchy[index], ...event }
     op.hide();
-
   }
 
   ngOnInit() {
@@ -183,10 +183,11 @@ export class FormComponent {
 
   chageValues(formResponse?: any) {
     var control = this.control.value.form
-    console.log('control', control)
     this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
       let formValid = {}
       this.titleFormSelected = data.title
+      this.descriptionFormSelected = data.description
+      this.sigleFormSelected = data.controlCreatedForm.sigle
       this.formSelected = data.form
       this.hierarchy = data.hierarchy
       if (formResponse) {
@@ -217,15 +218,30 @@ export class FormComponent {
         requesterId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14",
         formId: this.control.value.form.id,
         controlResponse: JSON.stringify(this.controlSelected.value),
-        approvers: ['f55cbd88-8e00-4709-b53a-758d585d7a56']
+        approvers: this.hierarchy.map((h: { id: any; }) => h.id)
       }
 
       this.requestService.save(payload).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
-          setTimeout(() => this.return(), 2000);
+        next: (sucess: any) => {
+          console.log('sucess', sucess)
+          this.confirmationService.confirm({
+            message: `Código da requisição: ${sucess.code}`,
+            acceptLabel: "OK",
+            icon: "pi pi-info-circle",
+            rejectVisible: false,
+            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+            accept: () => {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
+              setTimeout(() => this.return(), 2000);
+            }
+          });
+        },
+        error: ({ error }) => {
+          console.log('error', error)
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
         }
       })
+
     }
   }
 

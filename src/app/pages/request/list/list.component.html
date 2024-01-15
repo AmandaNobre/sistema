@@ -17,31 +17,10 @@
     </div>
 
     <div class="page">
-
-        <p-table styleClass="p-datatable-striped" [columns]="cols" [value]="requestsFilter"
-            [tableStyle]="{ 'min-width': '50rem' }">
-            <ng-template pTemplate="header" let-columns>
-                <tr>
-                    <th *ngFor="let col of columns">
-                        {{ col.header }}
-                    </th>
-                    <th style="width: 25%; text-align: center;">Ações</th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-rowData let-columns="columns">
-                <tr>
-                    <td *ngFor="let col of columns">
-                        {{ rowData[col.field] }}
-                    </td>
-                    <td style="text-align: center;">
-                        <!-- <p-button (click)="editOrView( rowData['id'], 'edit' )" class="mr-2"
-                            styleClass="p-button-warning " icon="pi pi-pencil" label="Editar"></p-button> -->
-                        <p-button (click)="editOrView( rowData['id'], 'view' )" icon="pi pi-eye"
-                            styleClass="p-button-info " label="Visualizar"></p-button>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+        <p-tabView>
+            <p-tabPanel *ngFor="let list of requestsFilter" header="{{list.title}}">
+                <app-table-custom [rows]="list.table" [cols]="cols"></app-table-custom>
+            </p-tabPanel>
+        </p-tabView>
     </div>
-
 </div>

@@ -2,11 +2,23 @@ body {
     height: 100vh !important;
 }
 
+.p-inputtext {
+    padding: 0.3rem 0.75rem !important;
+}
+
+.p-button {
+    padding: 5px 15px !important;
+}
+
+.brand-link {
+    padding: 0.48rem 0.5rem !important;
+}
+
 .page {
     background-color: #fff;
     border-radius: 11px;
     padding: 38px;
-    margin-bottom: 35px;
+    margin: 50px;
 }
 
 .p-inputswitch .p-inputswitch-slider {
@@ -21,7 +33,7 @@ body {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
-    padding: 20px 9px 13px 9px;
+    padding: 20px 45px 13px 45px;
 }
 
 

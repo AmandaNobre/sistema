@@ -1,4 +1,3 @@
-import { Title } from "@angular/platform-browser"
 import { IOptions } from "form-dynamic-angular"
 
 // user
@@ -100,3 +99,15 @@ export interface IAproveOrReject {
     requisitionId: string,
     id: string
 }
+
+export interface IMyRequisitions {
+    data: {
+        Aprovado: Array<IRequisition>,
+        Cancelado_Rejeitado: Array<IRequisition>,
+        Minhas_Aprovacoes: Array<IRequisition>,
+        Em_Andamento: Array<IRequisition>
+    }
+}
+
+
+export type TTitles = Array<'Aprovado' | 'Cancelado_Rejeitado' | 'Minhas_Aprovacoes' | 'Em_Andamento'>

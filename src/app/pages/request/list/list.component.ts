@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { FormService } from 'src/app/services/form.service';
-import { IDataForm, IDataRequisition, IDataUser, IUser } from 'src/app/interface';
+import { IDataForm, IDataUser, IMyRequisitions, IUser, TTitles } from 'src/app/interface';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -20,8 +20,8 @@ export class ListComponent implements OnInit {
   form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
-    { type: 'clean', onCLick: this.clickNew },
-    { type: 'filter', onCLick: () => this.filter() }
+    { type: 'clean', onCLick: () => this.clean(), styleClass: "p-button-outlined" },
+    { type: 'filter', onCLick: () => this.filter(), styleClass: "p-button-outlined" }
   ]
 
   cols: any[] = []
@@ -56,20 +56,27 @@ export class ListComponent implements OnInit {
       { field: 'status', header: 'Status' }
     ];
 
-    this.service.getAll().subscribe(({ data }: IDataRequisition) => {
-      const requestAll = data.map((d) => (
-        {
+    this.getAll()
+  }
+
+  getAll() {
+    this.service.getMyRequisitions("6b7055da-9bc7-4fc9-b4f8-fd5849e51a14").subscribe(({ data }: IMyRequisitions) => {
+      const titles: TTitles = Object.keys(data) as TTitles
+      const requestAll = titles.map((t) => ({
+        title: t,
+        table: data[t].map(d => ({
           ...d,
           title: this.form[0].options?.filter(o => o.id === d.customFormId)[0]?.descricao,
           user: this.users.filter(u => u.id == d.requesterId)[0]?.name
         }))
+      }))
       this.requests = requestAll
       this.requestsFilter = requestAll
     })
   }
 
   filter() {
-    this.requestsFilter = this.requests.filter(r => r.customFormId === this.control.value.form.id)
+    this.requestsFilter = this.requests.map(t => ({ ...t, table: t.table.filter((r: { customFormId: any; }) => r.customFormId === this.control.value.form.id) }))
   }
 
   clickNew() {
@@ -81,5 +88,12 @@ export class ListComponent implements OnInit {
     this.router.navigate([`${type}/${id}`], { relativeTo: this.route })
   }
 
+
+  clean() {
+    this.control = this.fb.group({
+      form: '',
+    })
+    this.getAll()
+  }
 
 }

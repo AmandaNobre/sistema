@@ -20,6 +20,8 @@ import { OrderListModule } from 'primeng/orderlist';
 import { DropdownModule } from 'primeng/dropdown';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { TabViewModule } from 'primeng/tabview';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -33,6 +35,8 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    ComponentsModule,
+    TabViewModule,
     AutoCompleteModule,
     OverlayPanelModule,
     DropdownModule,

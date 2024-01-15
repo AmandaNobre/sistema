@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IAproveOrReject, IDataRequisition, IDataRequisitionById, IRequisitionSave } from '../interface';
+import { IAproveOrReject, IDataRequisition, IDataRequisitionById, IMyRequisitions, IRequisitionSave } from '../interface';
 import { environment } from 'src/environment.ts/environments';
 
 @Injectable()
@@ -9,6 +9,10 @@ export class RequestService {
 
   getById(id: string) {
     return this.http.get<IDataRequisitionById>(`${environment.api_url}/Requisition/GetById/${id}`);
+  }
+
+  getMyRequisitions(id: string) {
+    return this.http.get<IMyRequisitions>(`${environment.api_url}/Requisition/GetMyRequisitions?RequesterId=${id}`);
   }
 
   getAll() {

@@ -5,7 +5,6 @@ import { IButtonsStandard, ICols, IForm, IOptions } from 'form-dynamic-angular';
 import { MessageService } from 'primeng/api';
 import { FormService } from '../../../services/form.service';
 import { IDataFormById, IDataTitle, IDataUser, IInput } from 'src/app/interface';
-import { UserService } from '../../../services/user.service';
 import { TitleService } from 'src/app/services/title.service';
 
 declare var $: any;
@@ -17,7 +16,6 @@ declare var $: any;
 
 export class FormComponent {
   table: any[] = []
-  tableInputs: any[] = []
 
   validateForm: boolean = false
   control: UntypedFormGroup = this.fb.group({
@@ -26,9 +24,10 @@ export class FormComponent {
 
   form: IForm[] = []
 
-  formName: string = ''
   controlNewForm: UntypedFormGroup = this.fb.group({
-    titleForm: 'Título do Formulário'
+    titleForm: 'Título do Formulário',
+    sigle: "Sigla",
+    description: "Descrição"
   })
   formCreated: Array<IInput> = []
 
@@ -54,8 +53,6 @@ export class FormComponent {
     { id: 2, descricao: "Cargo" }
   ]
 
-  optionsForm: IOptions[] = []
-
   typesInputs = [
     { label: "Data", command: () => this.addInput("date") },
     { label: "Número", command: () => this.addInput("number") },
@@ -68,6 +65,8 @@ export class FormComponent {
   type: string = ''
 
   title: string = "Cadastrar"
+  titles: any[] = []
+
   constructor(
     private messageService: MessageService,
     private formService: FormService,
@@ -102,6 +101,11 @@ export class FormComponent {
       });
     })
 
+    this.form = [
+      { label: 'Tipo de Aprovador', col: 'col-md-10', type: 'select', formControl: 'type', disabled: this.type == "view", required: true },
+      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button',  class: "mt-3 p-button-outlined", disabled: this.type == "view" },
+    ]
+
     if (this.id) {
       this.title = "Editar"
       this.formService.getById(this.id).subscribe(({ data }: IDataFormById) => {
@@ -118,6 +122,8 @@ export class FormComponent {
           type: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl(''),
           name: this.table.length === 0 ? new FormControl('', Validators.required) : new FormControl('')
         })
+        this.form[2] = { label: '', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols }
+
       })
 
     } else {
@@ -135,19 +141,14 @@ export class FormComponent {
     }
 
     this.titleService.getAll().subscribe(({ data }: IDataTitle) => {
-      this.form = [
-        { label: 'Tipo de Aprovador', col: 'col-md-10', type: 'select', options: data.map(d => ({ ...d, descricao: d.description })), formControl: 'type', disabled: this.type == "view", required: true },
-        { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3", disabled: this.type == "view" },
-        this.id !== '' ? { label: '', type: 'table', formControl: 'generic', rowsTable: this.table, colsTable: this.cols } : {}
-      ]
+      this.form[0].options = data.map(d => ({ ...d, descricao: d.description }))
     })
-    console.log('this.table', this.table)
+
+    console.log(this.controlNewForm.value)
   }
 
   add() {
     const control = this.control.value
-
-    console.log('control.type.descricao', control.type.descricao)
     if (control.type.descricao) {
       this.table.push({
         c1: control.type.descricao,
@@ -308,7 +309,7 @@ export class FormComponent {
         controlCreatedForm: JSON.stringify(this.controlNewForm.value),
         id: this.id ?? "",
         hierarchy: this.table.map(t => ({ order: t.order, titleId: t.titleId })),
-        description: "string",
+        description: this.controlNewForm.value.description,
         acronym: ""
       }
 

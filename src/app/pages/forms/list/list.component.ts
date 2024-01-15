@@ -19,8 +19,8 @@ export class ListComponent implements OnInit {
   form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
-    { type: 'clean', onCLick: () => this.clean() },
-    { type: 'filter', onCLick: () => this.filter() }
+    { type: 'clean', onCLick: () => this.clean(), styleClass: 'p-button-outlined' },
+    { type: 'filter', onCLick: () => this.filter(), styleClass: 'p-button-outlined' }
   ]
 
   cols: ICols[] = [
@@ -30,8 +30,8 @@ export class ListComponent implements OnInit {
   allForms: any[] = []
   formsFIlter: any[] | null = null
   buttonsTable: IButtonsOptional[] = [
-    { label: "Editar", icon: "pi pi-pencil", onCLick: (rowData: any) => this.editOrView(rowData['id'], 'edit'), styleClass: "p-button-warning mr-2" },
-    { label: "Excluir", icon: "pi pi-trash", onCLick: (rowData: any) => this.remove(rowData['id']), styleClass: "p-button-danger" }
+    { label: "Editar", icon: "pi pi-pencil", onCLick: (rowData: any) => this.editOrView(rowData['id'], 'edit'), styleClass: "p-button-warning p-button-outlined mr-2" },
+    { label: "Excluir", icon: "pi pi-trash", onCLick: (rowData: any) => this.remove(rowData['id']), styleClass: "p-button-danger p-button-outlined" }
   ]
 
   constructor(
