@@ -19,7 +19,7 @@
     <div class="page">
         <p-tabView>
             <p-tabPanel *ngFor="let list of requestsFilter" header="{{list.title}}">
-                <app-table-custom [rows]="list.table" [cols]="cols"></app-table-custom>
+                <app-table-custom [rows]="list.table" [cols]="cols" [buttonsOptional]="buttonsTable"></app-table-custom>
             </p-tabPanel>
         </p-tabView>
     </div>

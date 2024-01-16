@@ -124,8 +124,8 @@ export class FormComponent {
       ]
     } else {
       this.buttonsStandard = [
-        { type: 'cancel', onCLick: () => this.return() },
-        { type: 'save', onCLick: () => this.saveRequest() }
+        { type: 'cancel', onCLick: () => this.return(), styleClass: 'p-button-outlined' },
+        { type: 'save', onCLick: () => this.saveRequest(), styleClass: 'p-button-outlined' }
       ]
     }
   }

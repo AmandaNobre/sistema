@@ -2,6 +2,7 @@ import { OnChanges } from '@angular/core';
 import { SimpleChanges } from '@angular/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { IButtonsOptional, ICols } from 'form-dynamic-angular';
+import { Message } from 'primeng/api';
 
 interface PageEvent {
   first: number;
@@ -34,6 +35,8 @@ export class TableCustomComponent implements OnInit, OnChanges {
   rowsSkeleton: any[] = Array.from({ length: 5 }, (v, k) => k);
   first: number = 0;
   rowsPaginator: number = 10;
+
+  messages: Message[] = [{ severity: 'info', summary: 'Info', detail: 'Nenhum registro encontrado.' }];
 
   onPageChange(event: PageEvent) {
     console.log('this.rows', this.rows)

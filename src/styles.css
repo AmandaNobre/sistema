@@ -10,9 +10,6 @@ body {
     padding: 5px 15px !important;
 }
 
-.brand-link {
-    padding: 0.48rem 0.5rem !important;
-}
 
 .page {
     background-color: #fff;
@@ -44,8 +41,14 @@ body {
 }
 
 @media (max-width: 440px) {
-    .top-page {
-        display: block;
+
+    .top-page,
+    .form-created .buttons {
+        display: block !important;
+    }
+
+    .page {
+        margin: 12px;
     }
 }
 

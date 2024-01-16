@@ -10,6 +10,9 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { PaginatorModule } from 'primeng/paginator';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessagesModule } from 'primeng/messages';
+
 @NgModule({
   declarations: [
     AppheaderComponent,
@@ -18,6 +21,8 @@ import { PaginatorModule } from 'primeng/paginator';
     TableCustomComponent
   ],
   imports: [
+    MessagesModule,
+    TooltipModule,
     PaginatorModule,
     SkeletonModule,
     ButtonModule,

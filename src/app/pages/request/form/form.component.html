@@ -1,62 +1,48 @@
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-<div class="page">
-    <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
-        [control]=control></form-dynamic-angular>
+<div>
 
-    <!-- <form [formGroup]="controHierarchyr" class="form-created"> -->
-    <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="true">
-        <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
-            <div class="flex flex-wrap p-2 align-items-center gap-3">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+    <div class=" page">
+        <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
+            [control]=control></form-dynamic-angular>
 
-                <label>{{hierarchy.titleDescription}}</label> {{hierarchy.name}}
-                <p-button *ngIf="!hierarchy.name" (click)="op.toggle($event)"
-                    styleClass="p-button-text p-button-primary" icon="pi pi-plus"></p-button>
-                <p-button *ngIf="hierarchy.name" (click)="op.toggle($event)" styleClass="p-button-text p-button-primary"
-                    icon="pi pi-pencil"></p-button>
-                <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
-                    <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}"
-                        (onSelect)=" onChangevalues($event, indexHierarchy, op)" [suggestions]="filteredAutoComplete"
-                        (completeMethod)="filterAutoComplete($event)" [forceSelection]="false" dropdownMode="current"
-                        dataKey="id" field="name"></p-autoComplete>
+        <!-- <form [formGroup]="controHierarchyr" class="form-created"> -->
+        <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação"
+            [dragdrop]="true">
+            <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
+                <div class="flex flex-wrap p-2 align-items-center gap-3">
 
-                </p-overlayPanel>
-            </div>
-        </ng-template>
-    </p-orderList>
-    <!-- </form> -->
+                    <label>{{hierarchy.titleDescription}}</label> {{hierarchy.name}}
+                    <p-button *ngIf="!hierarchy.name" (click)="op.toggle($event)"
+                        styleClass="p-button-text p-button-primary" icon="pi pi-plus"></p-button>
+                    <p-button *ngIf="hierarchy.name" (click)="op.toggle($event)"
+                        styleClass="p-button-text p-button-primary" icon="pi pi-pencil"></p-button>
+                    <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
+                        <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}"
+                            (onSelect)=" onChangevalues($event, indexHierarchy, op)"
+                            [suggestions]="filteredAutoComplete" (completeMethod)="filterAutoComplete($event)"
+                            [forceSelection]="false" dropdownMode="current" dataKey="id" field="name"></p-autoComplete>
 
-
-    <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
-        [style]="{ width: '90vw', height: '500px' }">
-        <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
-            [control]=controlReject></form-dynamic-angular>
-    </p-dialog>
-</div>
+                    </p-overlayPanel>
+                </div>
+            </ng-template>
+        </p-orderList>
+        <!-- </form> -->
 
 
-<div class="page" *ngIf="formSelected.length > 0">
-    <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}"
-        description="{{descriptionFormSelected}}" [form]=formSelected [control]=controlSelected></form-dynamic-angular>
-</div>
-
-<p-divider></p-divider>
-
-<div class="buttons-form p-3">
-    <div *ngFor="let button of buttonsStandard">
-        <p-button *ngIf="button.type === 'clean'" styleClass="p-button-warning" label="Limpar"
-            (click)="button.onCLick()" icon="pi pi-times"></p-button>
-        <p-button *ngIf="button.type === 'filter'" label="Filtrar" (click)="button.onCLick()"
-            icon="pi pi-search"></p-button>
-        <p-button *ngIf="button.type === 'save'" styleClass="p-button-success" label="Salvar" (click)="button.onCLick()"
-            icon="pi pi-save"></p-button>
-        <p-button *ngIf="button.type === 'cancel'" styleClass="p-button-danger" label="Cancelar"
-            (click)="button.onCLick()" icon="pi pi-times"></p-button>
+        <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
+            [style]="{ width: '90vw', height: '500px' }">
+            <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
+                [control]=controlReject></form-dynamic-angular>
+        </p-dialog>
     </div>
-    <div *ngFor="let button of buttonsOptional">
-        <p-button styleClass={{button.styleClass}} label={{button.label}} (click)=" button.onCLick()"
-            icon={{button.icon}}></p-button>
-    </div>
-</div>
 
-<p-confirmDialog ></p-confirmDialog>
+
+    <div class="page" *ngIf="formSelected.length > 0">
+        <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}"
+            description="{{descriptionFormSelected}}" [form]=formSelected [control]=controlSelected
+            [buttonsStandard]="buttonsStandard"></form-dynamic-angular>
+    </div>
+
+    <p-confirmDialog></p-confirmDialog>
+</div>

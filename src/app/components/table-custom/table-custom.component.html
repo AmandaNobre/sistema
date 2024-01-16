@@ -1,4 +1,5 @@
-<p-table *ngIf="rows" [columns]="cols" [value]="rowsPagination" [tableStyle]="{ 'min-width': '50rem' }">
+<p-table *ngIf="rows && rows.length > 0" [columns]="cols" [value]="rowsPagination"
+    [tableStyle]="{ 'min-width': '50rem' }">
     <ng-template pTemplate="header" let-columns>
         <tr>
             <th *ngFor="let col of columns">
@@ -13,8 +14,9 @@
                 {{ rowData[col.field] }}
             </td>
             <td>
-                <p-button *ngFor="let button of buttonsOptional" styleClass={{button.styleClass}} label={{button.label}}
-                    (click)=" button.onCLick(rowData)" icon={{button.icon}}></p-button>
+                <p-button *ngFor="let button of buttonsOptional" styleClass={{button.styleClass}}
+                    (click)="button.onCLick(rowData)" pTooltip={{button.label}} [autoHide]="false" placeholder="top"
+                    tooltipPosition="top" icon={{button.icon}}></p-button>
             </td>
         </tr>
     </ng-template>
@@ -42,5 +44,7 @@
     </ng-template>
 </p-table>
 
-<p-paginator *ngIf="rows" (onPageChange)="onPageChange($event)" [first]="first" [rows]="rowsPaginator"
-    [totalRecords]="rows.length" [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
+<p-paginator *ngIf="rows && rows.length > 0" (onPageChange)="onPageChange($event)" [first]="first"
+    [rows]="rowsPaginator" [totalRecords]="rows.length" [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
+
+<p-messages *ngIf="rows && rows.length == 0" [(value)]="messages" [enableService]="false"></p-messages>

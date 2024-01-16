@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
+import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { FormService } from 'src/app/services/form.service';
 import { IDataForm, IDataUser, IMyRequisitions, IUser, TTitles } from 'src/app/interface';
@@ -22,6 +22,10 @@ export class ListComponent implements OnInit {
   buttonsStandard: IButtonsStandard[] = [
     { type: 'clean', onCLick: () => this.clean(), styleClass: "p-button-outlined" },
     { type: 'filter', onCLick: () => this.filter(), styleClass: "p-button-outlined" }
+  ]
+
+  buttonsTable: IButtonsOptional[] = [
+    { label: "Visualizar", icon: "pi pi-eye", onCLick: (rowData: any) => this.editOrView(rowData['id'], 'view'), styleClass: "p-button-info p-button-outlined mr-2" },
   ]
 
   cols: any[] = []
