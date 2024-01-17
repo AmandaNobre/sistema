@@ -7,8 +7,7 @@
             [control]=control></form-dynamic-angular>
 
         <!-- <form [formGroup]="controHierarchyr" class="form-created"> -->
-        <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação"
-            [dragdrop]="true">
+        <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="!id">
             <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
 
@@ -41,8 +40,7 @@
     <div class="page" *ngIf="formSelected.length > 0">
         <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}"
             description="{{descriptionFormSelected}}" [form]=formSelected [control]=controlSelected
-            [buttonsStandard]="buttonsStandard"></form-dynamic-angular>
+            [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"></form-dynamic-angular>
     </div>
 
-    <p-confirmDialog></p-confirmDialog>
 </div>

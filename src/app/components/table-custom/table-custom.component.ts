@@ -39,7 +39,6 @@ export class TableCustomComponent implements OnInit, OnChanges {
   messages: Message[] = [{ severity: 'info', summary: 'Info', detail: 'Nenhum registro encontrado.' }];
 
   onPageChange(event: PageEvent) {
-    console.log('this.rows', this.rows)
     if (this.rows) {
       this.rowsPagination = this.rows.slice(event.page * event.rows, event.page * event.rows + event.rows)
     }

@@ -78,7 +78,7 @@ export interface IRequisition {
     customFormId: string,
     controlResponse: string,
     customFormSnapshot: string,
-    approvers: Array<string>,
+    approvers: Array<any>,
     status: number,
     requester: string,
     customForm: string,

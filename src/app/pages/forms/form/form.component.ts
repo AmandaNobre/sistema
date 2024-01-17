@@ -144,7 +144,6 @@ export class FormComponent {
       this.form[0].options = data.map(d => ({ ...d, descricao: d.description }))
     })
 
-    console.log(this.controlNewForm.value)
   }
 
   add() {

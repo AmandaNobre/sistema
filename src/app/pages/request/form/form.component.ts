@@ -103,24 +103,27 @@ export class FormComponent {
       this.form = [
         { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
       ]
+      if (this.id) {
+        this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
+          this.hierarchy = data.approvers.map(a => ({
+            name: a.approverName
+          }))
+          this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
+          this.chageValues(data.controlResponse)
+        })
+        if (this.type == "view") {
+          this.title = "Visualizar"
+        }
+
+      }
     })
 
-    if (this.id) {
-      this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
-        this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
-        this.chageValues(data.controlResponse)
-      })
-      if (this.type == "view") {
-        this.title = "Visualizar"
-      }
-
-    }
 
     if (this.type == 'view') {
       this.buttonsOptional = [
-        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning" },
-        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success" },
-        { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger" },
+        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
+        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
+        { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
       ]
     } else {
       this.buttonsStandard = [
@@ -189,7 +192,13 @@ export class FormComponent {
       this.descriptionFormSelected = data.description
       this.sigleFormSelected = data.controlCreatedForm.sigle
       this.formSelected = data.form
-      this.hierarchy = data.hierarchy
+      this.hierarchy = this.hierarchy.length == 0
+        ? data.hierarchy
+        : this.hierarchy.map((h: any, index: number) => ({
+          ...h,
+          ...data.hierarchy[index]
+        }))
+
       if (formResponse) {
         this.formSelected.map((form: any) => (
           formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({ value: formResponse[form.formControl], disabled: true }) })
@@ -223,7 +232,6 @@ export class FormComponent {
 
       this.requestService.save(payload).subscribe({
         next: (sucess: any) => {
-          console.log('sucess', sucess)
           this.confirmationService.confirm({
             message: `Código da requisição: ${sucess.code}`,
             acceptLabel: "OK",
@@ -237,7 +245,6 @@ export class FormComponent {
           });
         },
         error: ({ error }) => {
-          console.log('error', error)
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
         }
       })
