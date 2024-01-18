@@ -1,0 +1,17 @@
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.conteudo {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.text-aling-center {
+    text-align: center;
+}

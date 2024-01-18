@@ -170,7 +170,7 @@ export class FormComponent {
           approverId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14"
         }
 
-        this.requestService.approveOrReject(payload, type === "aprovar" ? "Approve" : "Cancel").subscribe({
+        this.requestService.approveOrReject(payload, "Reject").subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
             setTimeout(() => this.return(), 2000);

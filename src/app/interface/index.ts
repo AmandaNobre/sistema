@@ -111,3 +111,13 @@ export interface IMyRequisitions {
 
 
 export type TTitles = Array<'Aprovado' | 'Cancelado_Rejeitado' | 'Minhas_Aprovacoes' | 'Em_Andamento'>
+
+// Auth
+export interface IAuth {
+    id: string,
+    registration: string,
+    username: string,
+    name: string,
+    email: string,
+    token: string
+}
