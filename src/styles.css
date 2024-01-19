@@ -121,3 +121,16 @@ body {
 .p-orderlist .p-orderlist-list .p-orderlist-item.p-highlight {
     background: #F4F6F9 !important;
 }
+
+.w-4rem {
+    width: 2rem !important;
+}
+
+.h-4rem {
+    height: 2rem !important;
+}
+
+.p-progress-circle,
+.p-progress-path {
+    fill: white !important;
+}

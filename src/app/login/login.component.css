@@ -15,3 +15,8 @@
 .text-aling-center {
     text-align: center;
 }
+
+.button {
+    width: 2px !important;
+    height: 2px !important;
+}

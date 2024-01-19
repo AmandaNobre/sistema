@@ -8,6 +8,7 @@ import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IDataU
 import { FormService } from 'src/app/services/form.service';
 import { UserService } from 'src/app/services/user.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-form-request',
@@ -59,6 +60,8 @@ export class FormComponent {
   title: string = "Cadastrar"
   users: IUser[] = []
 
+  userId: string = ''
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
@@ -67,11 +70,14 @@ export class FormComponent {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private formService: FormService,
-    private userService: UserService
+    private userService: UserService,
+    private authenticationService: AuthenticationService
   ) {
     this.route.params.subscribe(params => this.id = params['id']);
     this.route.params.subscribe(params => this.type = params['type']);
+    this.userId = JSON.parse(this.authenticationService.getLoggedUser()).id
   }
+
   filterAutoComplete(event: { query: any; }) {
     let filtered: any[] = [];
     let query = event.query;
@@ -141,7 +147,7 @@ export class FormComponent {
     var payload: IAproveOrReject = {
       id: this.id,
       requisitionId: this.id,
-      approverId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14"
+      approverId: this.userId
     }
 
     this.requestService.approveOrReject(payload, "Reject").subscribe({
@@ -167,7 +173,7 @@ export class FormComponent {
         var payload: IAproveOrReject = {
           id: this.id,
           requisitionId: this.id,
-          approverId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14"
+          approverId: this.userId
         }
 
         this.requestService.approveOrReject(payload, "Reject").subscribe({
@@ -224,7 +230,7 @@ export class FormComponent {
     if (this.controlSelected.status === "VALID") {
       this.validateForm = false
       var payload: IRequisitionSave = {
-        requesterId: "6B7055DA-9BC7-4FC9-B4F8-FD5849E51A14",
+        requesterId: this.userId,
         formId: this.control.value.form.id,
         controlResponse: JSON.stringify(this.controlSelected.value),
         approvers: this.hierarchy.map((h: { id: any; }) => h.id)

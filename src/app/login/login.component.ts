@@ -25,6 +25,7 @@ export class LoginComponent {
   ) { }
 
   validateForm: boolean = false
+  loading: boolean = false
 
   buttonsOptional: IButtonsOptional[] = [
     { label: "Salvar", onCLick: () => this.logar(), styleClass: "", icon: 'fa fa-eye' },
@@ -32,7 +33,7 @@ export class LoginComponent {
 
   form: IForm[] = [
     { label: 'Usuário', col: 'col-lg-12', type: 'text', formControl: 'username', required: true },
-    { label: 'Senha', col: 'col-lg-12', type: 'text', formControl: 'password', required: true }
+    { label: 'Senha', col: 'col-lg-12', type: 'password', formControl: 'password', required: true }
   ]
 
   control: UntypedFormGroup = this.fb.group({
@@ -41,6 +42,7 @@ export class LoginComponent {
   })
 
   logar() {
+    this.loading = true
     if (this.control.status === "VALID") {
       this.validateForm = false
       const control = this.control.value
@@ -48,16 +50,18 @@ export class LoginComponent {
 
       this.loginService.signIn(payload).subscribe({
         next: (data: IAuth) => {
+          this.loading = false
           this.authenticationService.setAuth(JSON.stringify(data))
           this.router.navigate([`/pages`], { relativeTo: this.route })
         },
         error: ({ error }) => {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
-
+          this.loading = false
         }
       })
     } else {
       this.validateForm = true
+      this.loading = false
 
     }
   }

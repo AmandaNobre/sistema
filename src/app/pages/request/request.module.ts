@@ -22,6 +22,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { TabViewModule } from 'primeng/tabview';
 import { ComponentsModule } from 'src/app/components/components.module';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -62,7 +63,8 @@ const routes: Routes = [
     MessageService,
     ConfirmationService,
     FormService,
-    UserService
+    UserService,
+    AuthenticationService
   ]
 })
 export class RequestModule { }

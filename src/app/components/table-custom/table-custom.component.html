@@ -47,4 +47,10 @@
 <p-paginator *ngIf="rows && rows.length > 0" (onPageChange)="onPageChange($event)" [first]="first"
     [rows]="rowsPaginator" [totalRecords]="rows.length" [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
 
-<p-messages *ngIf="rows && rows.length == 0" [(value)]="messages" [enableService]="false"></p-messages>
+
+<div *ngIf="rows && rows.length == 0" class="notFound">
+    <div class="w-100">
+        <p-image src="../../../assets/animations/notFound.gif" alt="Image" width="250"></p-image>
+        <p>Nenhum dado encontrado.</p>
+    </div>
+</div>

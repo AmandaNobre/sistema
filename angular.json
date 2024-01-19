@@ -34,11 +34,10 @@
               "node_modules/admin-lte/dist/css/adminlte.min.css"
             ],
             "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/admin-lte/plugins/jquery/jquery.min.js",
-              "node_modules/admin-lte/dist/js/adminlte.js"
-            ]
+              "node_modules/admin-lte/dist/js/adminlte.js",
+              "node_modules/admin-lte/plugins/jquery/jquery.js",
+              "node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.js"]
           },
           "configurations": {
             "production": {
@@ -107,11 +106,10 @@
               "node_modules/admin-lte/dist/css/adminlte.min.css"
             ],
             "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/admin-lte/plugins/jquery/jquery.min.js",
-              "node_modules/admin-lte/dist/js/adminlte.js"
-            ]
+              "node_modules/admin-lte/dist/js/adminlte.js",
+              "node_modules/admin-lte/plugins/jquery/jquery.js",
+              "node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.js"]
           }
         }
       }

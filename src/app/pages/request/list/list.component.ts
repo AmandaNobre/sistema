@@ -6,6 +6,7 @@ import { RequestService } from '../../../services/request.service';
 import { FormService } from 'src/app/services/form.service';
 import { IDataForm, IDataUser, IMyRequisitions, IUser, TTitles } from 'src/app/interface';
 import { UserService } from 'src/app/services/user.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-request',
@@ -33,16 +34,23 @@ export class ListComponent implements OnInit {
   requestsFilter: any[] = []
   users: IUser[] = []
 
+  userId: string = ''
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private service: RequestService,
     private formService: FormService,
-    private userService: UserService
-  ) { }
+    private userService: UserService,
+    private authenticationService: AuthenticationService
+  ) {
+    this.userId = JSON.parse(this.authenticationService.getLoggedUser()).id
+  }
 
   ngOnInit() {
+
+
     this.userService.getAll().subscribe(({ data }: IDataUser) => (
       this.users = data
     ))
@@ -56,7 +64,7 @@ export class ListComponent implements OnInit {
 
     this.cols = [
       { field: 'title', header: 'Tipo de formulário' },
-      { field: 'user', header: 'Usuário' },
+      { field: 'requesterName', header: 'Usuário' },
       { field: 'status', header: 'Status' }
     ];
 
@@ -64,14 +72,12 @@ export class ListComponent implements OnInit {
   }
 
   getAll() {
-    this.service.getMyRequisitions("6b7055da-9bc7-4fc9-b4f8-fd5849e51a14").subscribe(({ data }: IMyRequisitions) => {
+    this.service.getMyRequisitions(this.userId).subscribe(({ data }: IMyRequisitions) => {
       const titles: TTitles = Object.keys(data) as TTitles
       const requestAll = titles.map((t) => ({
         title: t,
         table: data[t].map(d => ({
-          ...d,
-          title: this.form[0].options?.filter(o => o.id === d.customFormId)[0]?.descricao,
-          user: this.users.filter(u => u.id == d.requesterId)[0]?.name
+          ...d
         }))
       }))
       this.requests = requestAll

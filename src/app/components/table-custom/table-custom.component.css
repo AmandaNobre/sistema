@@ -1,0 +1,9 @@
+.notFound{
+    display: flex;
+    justify-items: center;
+    text-align: center;
+}
+
+.notFound p{
+    color: #bec0c2
+}

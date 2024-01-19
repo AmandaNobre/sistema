@@ -8,6 +8,7 @@ import { LoginService } from '../services/login.service';
 import { ImageModule } from 'primeng/image';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [LoginComponent],
   imports: [
+    ProgressSpinnerModule,
     CommonModule,
     RouterModule.forChild(routes),
     ComponentsModule,

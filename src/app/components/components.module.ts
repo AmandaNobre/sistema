@@ -12,6 +12,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
+import { AuthenticationService } from '../services/authentication.service';
+import { ImageModule } from 'primeng/image';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,7 @@ import { MessagesModule } from 'primeng/messages';
     TableCustomComponent
   ],
   imports: [
+    ImageModule,
     MessagesModule,
     TooltipModule,
     PaginatorModule,
@@ -36,7 +39,8 @@ import { MessagesModule } from 'primeng/messages';
     AppMenuComponent,
     ControlSideBarComponent,
     TableCustomComponent
-  ]
+  ],
+  providers: [AuthenticationService]
 })
 
 export class ComponentsModule { }
