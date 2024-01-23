@@ -62,6 +62,8 @@ export class FormComponent {
 
   userId: string = ''
 
+  formView: any
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
@@ -104,11 +106,18 @@ export class FormComponent {
       this.users = data
     ))
 
-    this.formService.getAll().subscribe(({ data }: IDataForm) => {
-      this.options = data.map(d => ({ ...d, descricao: d.title }))
-      this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
-      ]
+    const formoptions = new Promise((resolve, reject) => {
+      this.formService.getAll().subscribe(({ data }: IDataForm) => {
+        this.options = data.map(d => ({ ...d, descricao: d.title }))
+        resolve(this.form = [
+          { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
+        ]
+        )
+      })
+    });
+
+
+    Promise.all([formoptions]).then((values) => {
       if (this.id) {
         this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
           this.hierarchy = data.approvers.map(a => ({
@@ -116,27 +125,35 @@ export class FormComponent {
           }))
           this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
           this.chageValues(data.controlResponse)
+          if (this.type == "view") {
+            this.title = "Visualizar"
+
+            if (data.actions.approve) {
+              this.buttonsOptional.push(
+                { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
+              )
+
+            }
+            if (data.actions.reject) {
+              this.buttonsOptional.push(
+                { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
+              )
+            }
+            if (data.actions.cancel) {
+              this.buttonsOptional.push(
+                { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
+              )
+            }
+          }
+
         })
-        if (this.type == "view") {
-          this.title = "Visualizar"
-        }
-
+      } else {
+        this.buttonsStandard = [
+          { type: 'cancel', onCLick: () => this.return(), styleClass: 'p-button-outlined' },
+          { type: 'save', onCLick: () => this.saveRequest(), styleClass: 'p-button-outlined' }
+        ]
       }
-    })
-
-
-    if (this.type == 'view') {
-      this.buttonsOptional = [
-        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
-        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
-        { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
-      ]
-    } else {
-      this.buttonsStandard = [
-        { type: 'cancel', onCLick: () => this.return(), styleClass: 'p-button-outlined' },
-        { type: 'save', onCLick: () => this.saveRequest(), styleClass: 'p-button-outlined' }
-      ]
-    }
+    });
   }
 
   reject() {
@@ -216,6 +233,41 @@ export class FormComponent {
       }
 
       this.controlSelected = this.fb.group(formValid)
+
+      if (this.titleFormSelected === "Solicitação de Compra") {
+        this.formView = {
+          itens: [
+            {
+              seq: 123,
+              um: "Teste",
+              unitValue: 140.5,
+              item: "Teste",
+              qtdRequested: 123,
+              totalValue: 140.5,
+              qtdToMeet: 140.5,
+              reference: "Teste",
+              urgent: "Sim",
+              priority: "Alta",
+              account: "Teste",
+              costCenter: "Teste",
+              narrative: "Teste",
+              deliveryDate: '22/01/2024',
+              supplierApproval: "Sim",
+              codeUsage: "Teste",
+              investOrder: 123,
+              affectsQuality: "Sim",
+              customization: "Teste",
+            }
+          ],
+          requisition: "123456789",
+          establishment: "Estabelecimento 1",
+          requester: 'Requisitante 1',
+          capacity: 'Lotação 1',
+          requestData: '22/01/2024',
+          deliveryPlace: 'Local de entega 1',
+          typeOfRequest: 'Solicitação de compras',
+        }
+      }
     })
 
   }
@@ -261,5 +313,22 @@ export class FormComponent {
   return() {
     this.router.navigate([`/pages/request`], { relativeTo: this.route })
 
+  }
+
+  seeMore(index: any) {
+    let maisTexto = document.getElementById(`mais${index}`);
+    let btnVermais = document.getElementById(`btnVerMais${index}`);
+
+
+    if (maisTexto && btnVermais) {
+      if (maisTexto.style.display !== "none") {
+        maisTexto.style.display = "none";
+        btnVermais.innerHTML = `Ver Mais <i class="pi pi-angle-down"></i>` ;
+      } else {
+        maisTexto.style.display = "grid";
+        btnVermais.innerHTML = `Ver Menos <i class="pi pi-angle-up"></i>` ;
+
+      }
+    }
   }
 }

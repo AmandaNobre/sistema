@@ -83,6 +83,7 @@ export interface IRequisition {
     requester: string,
     customForm: string,
     id: string
+    actions: { approve: boolean, reject: boolean, cancel: boolean }
 
 }
 

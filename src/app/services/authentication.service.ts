@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environment.ts/environments';
-// import { JwtHelperService } from '@auth0/angular-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 
 @Injectable()
@@ -11,7 +11,7 @@ export class AuthenticationService {
 
     constructor(
         public http: HttpClient,
-        // private jwtHelper: JwtHelperService
+        private jwtHelper: JwtHelperService
     ) {
         this.currentUserSubject = new BehaviorSubject<any>(localStorage.getItem(environment.user));
     }
@@ -20,17 +20,17 @@ export class AuthenticationService {
         let itemLocal = (localStorage.getItem(environment.user)) || null;
 
         if (itemLocal) {
-            return JSON.parse(itemLocal)?.token;
+            return JSON.parse(JSON.parse(itemLocal))?.token;
         } else {
             return '';
         }
     }
     tokenHasExpired(): boolean {
-        // if (this.jwtHelper.isTokenExpired(this.getToken())) {
-        //     return true
-        // } else {
-        return true
-        // }
+        if (this.jwtHelper.isTokenExpired(this.getToken())) {
+            return true
+        } else {
+            return false
+        }
     }
 
     setAuth(identity: any) {

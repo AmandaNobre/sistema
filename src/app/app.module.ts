@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RequestInterceptor } from 'src/interceptors/request.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { MessageService } from 'primeng/api';
+import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 
 const routes: Routes = [
   { path: '', redirectTo: 'pages', pathMatch: 'full' },
@@ -32,7 +33,9 @@ const routes: Routes = [
       multi: true,
     },
     AuthenticationService,
-    MessageService
+    MessageService,
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService
   ],
   bootstrap: [AppComponent]
 })

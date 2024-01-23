@@ -23,6 +23,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { TabViewModule } from 'primeng/tabview';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { PanelModule } from 'primeng/panel';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -52,7 +53,8 @@ const routes: Routes = [
     ButtonModule,
     ToastModule,
     ConfirmDialogModule,
-    DialogModule
+    DialogModule,
+    PanelModule
   ],
   exports: [
     ListComponent,

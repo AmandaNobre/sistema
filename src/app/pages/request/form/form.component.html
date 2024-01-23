@@ -2,7 +2,7 @@
 
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    <div class=" page">
+    <div class=" page" *ngIf=" titleFormSelected !== 'Solicitação de Compra'">
         <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
             [control]=control></form-dynamic-angular>
 
@@ -36,11 +36,139 @@
         </p-dialog>
     </div>
 
-
     <div class="page" *ngIf="formSelected.length > 0">
-        <form-dynamic-angular [validateForm]=validateForm title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}"
-            description="{{descriptionFormSelected}}" [form]=formSelected [control]=controlSelected
-            [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"></form-dynamic-angular>
+        <div *ngIf=" titleFormSelected == 'Solicitação de Compra'">
+            <div>
+                <span class="text-bold">Requisição</span>
+                <p>{{formView.requisition}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Establelecimento</span>
+                <p>{{formView.establishment}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Requisitante</span>
+                <p>{{formView.requester}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Lotação</span>
+                <p>{{formView.capacity}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Data da Requisição</span>
+                <p>{{formView.requestData}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Local de Entrega</span>
+                <p>{{formView.deliveryPlace}}</p>
+            </div>
+            <div>
+                <span class="text-bold">Tipo de Requisição</span>
+                <p>{{formView.typeOfRequest}}</p>
+            </div>
+
+            <div>
+                <span class="titleItens">Itens</span>
+                <div *ngFor="let product of formView.itens; let i = index" class="products">
+                    <div class="d-grid">
+                        <div>
+                            <div>
+                                <span class="text-bold">Seq: </span>
+                                <span>{{product.seq}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">UM: </span>
+                                <span>{{product.um}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Valor Unitário: </span>
+                                <span>{{product.unitValue}}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <span class="text-bold">Item: </span>
+                                <span>{{product.item}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Qtd. requisitada: </span>
+                                <span>{{product.qtdRequested}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Valor Total: </span>
+                                <span>{{product.totalValue}}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-bold">Qtd. atender: </span>
+                            <span>{{product.qtdToMeet}}</span>
+                        </div>
+                    </div>
+                    <div id="mais{{i}}" class="columns" style="display: none;">
+                        <div>
+                            <div>
+                                <span class="text-bold">Referência: </span>
+                                <span>{{product.reference}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Urgente: </span>
+                                <span>{{product.urgent}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Prioridade: </span>
+                                <span>{{product.priority}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Conta: </span>
+                                <span>{{product.account}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Centro de custo: </span>
+                                <span>{{product.costCenter}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Narrativa: </span>
+                                <span>{{product.narrative}}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <span class="text-bold">Data Entrega: </span>
+                                <span>{{product.deliveryDate}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Homologa Fornecedor: </span>
+                                <span>{{product.supplierApproval}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Código Utilização: </span>
+                                <span>{{product.codeUsage}}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div>
+                                <span class="text-bold">Ordem invest: </span>
+                                <span>{{product.investOrder}}</span>
+                            </div>
+                            <div>
+                                <span class="text-bold">Afeta Qualidade: </span>
+                                <span>{{product.affectsQuality}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="btnVerMais{{i}}" (click)="seeMore(i)" class="seeMore">Ver
+                        Mais <i class="pi pi-angle-down"></i>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        <form-dynamic-angular *ngIf=" titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
+            title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}"
+            [form]=formSelected [control]=controlSelected [buttonsStandard]="buttonsStandard"
+            [buttonsOptional]="buttonsOptional"></form-dynamic-angular>
     </div>
 
 </div>
