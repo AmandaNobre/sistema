@@ -1,5 +1,11 @@
 import { IOptions } from "form-dynamic-angular"
 
+// geral
+export interface IOptionsIntegration{
+    label: string,
+    value: string
+}
+
 // user
 export interface IUser {
     userName: string,

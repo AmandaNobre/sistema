@@ -64,7 +64,7 @@ export class FormComponent {
   id: string = ''
   type: string = ''
 
-  title: string = "Cadastrar"
+  title: string = "Cadastrar Formulário"
   titles: any[] = []
 
   constructor(
@@ -107,7 +107,7 @@ export class FormComponent {
     ]
 
     if (this.id) {
-      this.title = "Editar"
+      this.title = "Editar Formulário"
       this.formService.getById(this.id).subscribe(({ data }: IDataFormById) => {
         this.controlNewForm = this.fb.group(data.controlCreatedForm)
         this.formCreated = data.form
@@ -182,8 +182,8 @@ export class FormComponent {
   }
 
   addLocalStorage() {
-    localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
-    localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
+    // localStorage.setItem("formCreated", JSON.stringify(this.formCreated));
+    // localStorage.setItem("controlNewForm", JSON.stringify(this.controlNewForm.value));
   }
 
   addInput(type: "date" | "number" | "select" | "text" | "upload-files") {
@@ -311,8 +311,6 @@ export class FormComponent {
         description: this.controlNewForm.value.description,
         acronym: ""
       }
-
-      localStorage.clear();
 
       if (this.id) {
         this.formService.edit(payload).subscribe({

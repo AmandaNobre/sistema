@@ -1,0 +1,11 @@
+.sticky {
+    background: #F4F6F9;
+    position: sticky;
+    top: 57px;
+    z-index: 1;
+    padding: 30px 50px ;
+}
+
+.title {
+    font-size: 21px;
+}

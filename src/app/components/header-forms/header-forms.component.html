@@ -1,0 +1,17 @@
+<div class="sticky">
+    <div class="d-flex justify-content-between">
+        <label class="title">{{title}}</label>
+        <div class="d-flex gap-3">
+            <div *ngFor="let button of buttonsStandard">
+                <p-button *ngIf="button.type === 'save'" styleClass="p-button-success  p-button-outlined" label="Salvar"
+                    (click)="button.onCLick()" icon="pi pi-save"></p-button>
+                <p-button *ngIf="button.type === 'cancel'" styleClass="p-button-warning p-button-outlined"
+                    label="Voltar" (click)="button.onCLick()" icon="pi pi-history"></p-button>
+            </div>
+            <div *ngFor="let button of buttonsOptional">
+                <p-button styleClass={{button.styleClass}} label={{button.label}} (click)=" button.onCLick()"
+                    icon={{button.icon}}></p-button>
+            </div>
+        </div>
+    </div>
+</div>

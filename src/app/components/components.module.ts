@@ -14,13 +14,15 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessagesModule } from 'primeng/messages';
 import { AuthenticationService } from '../services/authentication.service';
 import { ImageModule } from 'primeng/image';
+import { HeaderFormsComponent } from './header-forms/header-forms.component';
 
 @NgModule({
   declarations: [
     AppheaderComponent,
     AppMenuComponent,
     ControlSideBarComponent,
-    TableCustomComponent
+    TableCustomComponent,
+    HeaderFormsComponent
   ],
   imports: [
     ImageModule,
@@ -38,7 +40,8 @@ import { ImageModule } from 'primeng/image';
     AppheaderComponent,
     AppMenuComponent,
     ControlSideBarComponent,
-    TableCustomComponent
+    TableCustomComponent,
+    HeaderFormsComponent
   ],
   providers: [AuthenticationService]
 })

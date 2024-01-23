@@ -4,7 +4,7 @@ import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IDataUser, IRequisitionSave, IUser } from 'src/app/interface';
+import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IDataUser, IOptionsIntegration, IRequisitionSave, IUser } from 'src/app/interface';
 import { FormService } from 'src/app/services/form.service';
 import { UserService } from 'src/app/services/user.service';
 import { OverlayPanel } from 'primeng/overlaypanel';
@@ -64,6 +64,41 @@ export class FormComponent {
 
   formView: any
 
+  infoRequestSale: IOptionsIntegration[] = [
+    { label: "Requisição", value: "requisition" },
+    { label: "Establelecimento", value: "establishment" },
+    { label: "Requisitante", value: "requester" },
+    { label: "Lotação", value: "capacity" },
+    { label: "Data da Requisição", value: "requestData" },
+    { label: "Local de Entrega", value: "deliveryPlace" },
+    { label: "Tipo de Requisição", value: "typeOfRequest" }
+  ]
+
+  infoRequestSaleItens: IOptionsIntegration[] = [
+    { label: "Seq:", value: "seq" },
+    { label: "UM:", value: "um" },
+    { label: "Valor Unitário:", value: "unitValue" },
+    { label: "Item:", value: "item" },
+    { label: "Qtd. requisitada:", value: "qtdRequested" },
+    { label: "Valor Total:", value: "totalValue" },
+    { label: "Qtd. atender:", value: "qtdToMeet" }
+  ]
+
+  infoRequestSaleItensMore: IOptionsIntegration[] = [
+    { label: "Referência:", value: "reference" },
+    { label: "Urgente:", value: "urgent" },
+    { label: "Prioridade:", value: "priority" },
+    { label: "Conta:", value: "account" },
+    { label: "Centro de custo:", value: "costCenter" },
+    { label: "Narrativa:", value: "narrative" },
+    { label: "Data Entrega:", value: "deliveryDate" },
+    { label: "Homologa Fornecedor:", value: "supplierApproval" },
+    { label: "Código Utilização:", value: "codeUsage" },
+    { label: "Ordem invest:", value: "investOrder" },
+    { label: "Afeta Qualidade:", value: "affectsQuality" },
+
+  ]
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
@@ -102,6 +137,10 @@ export class FormComponent {
   }
 
   ngOnInit() {
+    if (this.type == "view") {
+      this.title = "Visualizar"
+    }
+
     this.userService.getAll().subscribe(({ data }: IDataUser) => (
       this.users = data
     ))
@@ -116,7 +155,6 @@ export class FormComponent {
       })
     });
 
-
     Promise.all([formoptions]).then((values) => {
       if (this.id) {
         this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
@@ -125,25 +163,21 @@ export class FormComponent {
           }))
           this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
           this.chageValues(data.controlResponse)
-          if (this.type == "view") {
-            this.title = "Visualizar"
 
-            if (data.actions.approve) {
-              this.buttonsOptional.push(
-                { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
-              )
-
-            }
-            if (data.actions.reject) {
-              this.buttonsOptional.push(
-                { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
-              )
-            }
-            if (data.actions.cancel) {
-              this.buttonsOptional.push(
-                { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
-              )
-            }
+          if (data.actions.approve) {
+            this.buttonsOptional.push(
+              { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
+            )
+          }
+          if (data.actions.reject) {
+            this.buttonsOptional.push(
+              { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
+            )
+          }
+          if (data.actions.cancel) {
+            this.buttonsOptional.push(
+              { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
+            )
           }
 
         })
@@ -269,7 +303,6 @@ export class FormComponent {
         }
       }
     })
-
   }
 
   clickNew() {
@@ -306,27 +339,24 @@ export class FormComponent {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
         }
       })
-
     }
   }
 
   return() {
     this.router.navigate([`/pages/request`], { relativeTo: this.route })
-
   }
 
   seeMore(index: any) {
     let maisTexto = document.getElementById(`mais${index}`);
     let btnVermais = document.getElementById(`btnVerMais${index}`);
 
-
     if (maisTexto && btnVermais) {
       if (maisTexto.style.display !== "none") {
         maisTexto.style.display = "none";
-        btnVermais.innerHTML = `Ver Mais <i class="pi pi-angle-down"></i>` ;
+        btnVermais.innerHTML = `Ver Mais <i class="pi pi-angle-down"></i>`;
       } else {
         maisTexto.style.display = "grid";
-        btnVermais.innerHTML = `Ver Menos <i class="pi pi-angle-up"></i>` ;
+        btnVermais.innerHTML = `Ver Menos <i class="pi pi-angle-up"></i>`;
 
       }
     }

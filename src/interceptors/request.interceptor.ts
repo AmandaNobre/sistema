@@ -43,7 +43,6 @@ export class RequestInterceptor implements HttpInterceptor {
         //   if (this.authenticationService.tokenHasExpired()) {
         //     // this.getRefreshToken()
         //     this.authenticationService.loggout()
-        //     this.router.navigate(['/login']);
         //   }
 
         if (this.activeRequests === 0) {

@@ -4,7 +4,9 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 @Component({
   selector: 'app-appheader',
   templateUrl: './appheader.component.html',
+  styleUrls: ['./appheader.component.css']
 })
+
 export class AppheaderComponent implements OnInit {
 
   constructor(

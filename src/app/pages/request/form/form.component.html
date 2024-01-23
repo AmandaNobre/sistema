@@ -1,12 +1,12 @@
 <div>
-
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    <div class=" page" *ngIf=" titleFormSelected !== 'Solicitação de Compra'">
-        <form-dynamic-angular (onChange)=chageValues() title="{{title}} Solicitação" [form]=form
-            [control]=control></form-dynamic-angular>
+    <app-header-forms [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"
+        title="{{title}} Solicitação"></app-header-forms>
 
-        <!-- <form [formGroup]="controHierarchyr" class="form-created"> -->
+    <div class="page" *ngIf="titleFormSelected !== 'Solicitação de Compra'">
+        <form-dynamic-angular (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
+
         <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="!id">
             <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
@@ -26,8 +26,6 @@
                 </div>
             </ng-template>
         </p-orderList>
-        <!-- </form> -->
-
 
         <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
             [style]="{ width: '90vw', height: '500px' }">
@@ -36,126 +34,25 @@
         </p-dialog>
     </div>
 
-    <div class="page" *ngIf="formSelected.length > 0">
-        <div *ngIf=" titleFormSelected == 'Solicitação de Compra'">
-            <div>
-                <span class="text-bold">Requisição</span>
-                <p>{{formView.requisition}}</p>
+    <div class="page mt-100" *ngIf="formSelected.length > 0">
+        <div *ngIf="titleFormSelected == 'Solicitação de Compra'">
+            <div *ngFor="let input of infoRequestSale">
+                <span class="text-bold">{{input.label}}</span>
+                <p>{{formView[input.value]}}</p>
             </div>
-            <div>
-                <span class="text-bold">Establelecimento</span>
-                <p>{{formView.establishment}}</p>
-            </div>
-            <div>
-                <span class="text-bold">Requisitante</span>
-                <p>{{formView.requester}}</p>
-            </div>
-            <div>
-                <span class="text-bold">Lotação</span>
-                <p>{{formView.capacity}}</p>
-            </div>
-            <div>
-                <span class="text-bold">Data da Requisição</span>
-                <p>{{formView.requestData}}</p>
-            </div>
-            <div>
-                <span class="text-bold">Local de Entrega</span>
-                <p>{{formView.deliveryPlace}}</p>
-            </div>
-            <div>
-                <span class="text-bold">Tipo de Requisição</span>
-                <p>{{formView.typeOfRequest}}</p>
-            </div>
-
             <div>
                 <span class="titleItens">Itens</span>
                 <div *ngFor="let product of formView.itens; let i = index" class="products">
                     <div class="d-grid">
-                        <div>
-                            <div>
-                                <span class="text-bold">Seq: </span>
-                                <span>{{product.seq}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">UM: </span>
-                                <span>{{product.um}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Valor Unitário: </span>
-                                <span>{{product.unitValue}}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div>
-                                <span class="text-bold">Item: </span>
-                                <span>{{product.item}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Qtd. requisitada: </span>
-                                <span>{{product.qtdRequested}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Valor Total: </span>
-                                <span>{{product.totalValue}}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <span class="text-bold">Qtd. atender: </span>
-                            <span>{{product.qtdToMeet}}</span>
+                        <div *ngFor="let input of infoRequestSaleItens">
+                            <span class="text-bold">{{input.label}} </span>
+                            <span>{{product[input.value]}}</span>
                         </div>
                     </div>
                     <div id="mais{{i}}" class="columns" style="display: none;">
-                        <div>
-                            <div>
-                                <span class="text-bold">Referência: </span>
-                                <span>{{product.reference}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Urgente: </span>
-                                <span>{{product.urgent}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Prioridade: </span>
-                                <span>{{product.priority}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Conta: </span>
-                                <span>{{product.account}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Centro de custo: </span>
-                                <span>{{product.costCenter}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Narrativa: </span>
-                                <span>{{product.narrative}}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div>
-                                <span class="text-bold">Data Entrega: </span>
-                                <span>{{product.deliveryDate}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Homologa Fornecedor: </span>
-                                <span>{{product.supplierApproval}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Código Utilização: </span>
-                                <span>{{product.codeUsage}}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div>
-                                <span class="text-bold">Ordem invest: </span>
-                                <span>{{product.investOrder}}</span>
-                            </div>
-                            <div>
-                                <span class="text-bold">Afeta Qualidade: </span>
-                                <span>{{product.affectsQuality}}</span>
-                            </div>
+                        <div *ngFor="let input of infoRequestSaleItensMore">
+                            <span class="text-bold">{{input.label}} </span>
+                            <span>{{product[input.value]}}</span>
                         </div>
                     </div>
                     <p id="btnVerMais{{i}}" (click)="seeMore(i)" class="seeMore">Ver
@@ -163,12 +60,11 @@
                     </p>
                 </div>
             </div>
-
         </div>
-        <form-dynamic-angular *ngIf=" titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
+
+        <form-dynamic-angular *ngIf="titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
             title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}"
-            [form]=formSelected [control]=controlSelected [buttonsStandard]="buttonsStandard"
-            [buttonsOptional]="buttonsOptional"></form-dynamic-angular>
+            [form]=formSelected [control]=controlSelected></form-dynamic-angular>
     </div>
 
 </div>

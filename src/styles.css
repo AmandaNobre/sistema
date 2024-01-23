@@ -30,8 +30,7 @@ body {
 .top-page {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 20px 45px 13px 45px;
+    padding: 90px 50px 0 50px;
 }
 
 
