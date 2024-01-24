@@ -1,12 +1,70 @@
-<div class="page">
+<div>
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Solicitação"
-        [form]=form [control]=control [buttonsOptional]=buttonsOptional></form-dynamic-angular>
+    <app-header-forms [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"
+        title="{{title}} Solicitação"></app-header-forms>
 
+    <div class="page" *ngIf="titleFormSelected !== 'Solicitação de Compra'">
+        <form-dynamic-angular (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
 
-    <p-dialog  [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible" [style]="{ width: '90vw', height: '500px' }">
-        <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject
-            [form]=formmReject [control]=controlReject ></form-dynamic-angular>
-    </p-dialog>
+        <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="!id">
+            <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
+                <div class="flex flex-wrap p-2 align-items-center gap-3">
+
+                    <label>{{hierarchy.titleDescription}}</label> {{hierarchy.name}}
+                    <p-button *ngIf="!hierarchy.name" (click)="op.toggle($event)"
+                        styleClass="p-button-text p-button-primary" icon="pi pi-plus"></p-button>
+                    <p-button *ngIf="hierarchy.name && type !== 'view'" (click)="op.toggle($event)"
+                        styleClass="p-button-text p-button-primary" icon="pi pi-pencil"></p-button>
+                    <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
+                        <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}"
+                            (onSelect)=" onChangevalues($event, indexHierarchy, op)"
+                            [suggestions]="filteredAutoComplete" (completeMethod)="filterAutoComplete($event)"
+                            [forceSelection]="false" dropdownMode="current" dataKey="id" field="name"></p-autoComplete>
+
+                    </p-overlayPanel>
+                </div>
+            </ng-template>
+        </p-orderList>
+
+        <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
+            [style]="{ width: '90vw', height: '500px' }">
+            <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
+                [control]=controlReject></form-dynamic-angular>
+        </p-dialog>
+    </div>
+
+    <div class="page mt-100" *ngIf="formSelected.length > 0">
+        <div *ngIf="titleFormSelected == 'Solicitação de Compra'">
+            <div *ngFor="let input of infoRequestSale">
+                <span class="text-bold">{{input.label}}</span>
+                <p>{{formView[input.value]}}</p>
+            </div>
+            <div>
+                <span class="titleItens">Itens</span>
+                <div *ngFor="let product of formView.itens; let i = index" class="products">
+                    <div class="d-grid">
+                        <div *ngFor="let input of infoRequestSaleItens">
+                            <span class="text-bold">{{input.label}} </span>
+                            <span>{{product[input.value]}}</span>
+                        </div>
+                    </div>
+                    <div id="mais{{i}}" class="columns" style="display: none;">
+                        <div *ngFor="let input of infoRequestSaleItensMore">
+                            <span class="text-bold">{{input.label}} </span>
+                            <span>{{product[input.value]}}</span>
+                        </div>
+                    </div>
+                    <p id="btnVerMais{{i}}" (click)="seeMore(i)" class="seeMore">Ver
+                        Mais <i class="pi pi-angle-down"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form-dynamic-angular *ngIf="titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
+            title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}"
+            [form]=formSelected [control]=controlSelected></form-dynamic-angular>
+    </div>
+
 </div>

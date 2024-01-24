@@ -1,12 +1,26 @@
 body {
     height: 100vh !important;
+    background-color: #F4F6F9 !important;
 }
+
+.p-inputtext {
+    padding: 0.3rem 0.75rem !important;
+}
+
+.p-button {
+    padding: 5px 15px !important;
+}
+
 
 .page {
     background-color: #fff;
     border-radius: 11px;
     padding: 38px;
-    margin-bottom: 35px;
+    margin: 50px;
+}
+
+.p-inputswitch .p-inputswitch-slider {
+    background: #ced4da !important;
 }
 
 .p-toast {
@@ -16,8 +30,7 @@ body {
 .top-page {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 20px 9px 13px 9px;
+    padding: 90px 50px 0 50px;
 }
 
 
@@ -28,7 +41,95 @@ body {
 }
 
 @media (max-width: 440px) {
-    .top-page {
-        display: block;
+
+    .top-page,
+    .form-created .buttons {
+        display: block !important;
     }
+
+    .page {
+        margin: 12px;
+    }
+}
+
+.form-created {
+    padding: 30px 0;
+}
+
+.form-created .buttons {
+    display: flex;
+    justify-content: end;
+}
+
+#editTitle {
+    display: none;
+}
+
+#title:hover,
+#editTitle {
+    background-color: #F4F6F9;
+    cursor: pointer;
+}
+
+#title,
+#editTitle {
+    padding: 20px 10px;
+}
+
+.buttons-form {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    background-color: #fff;
+}
+
+
+.drag-image {
+    border: 1px dashed #000;
+    height: auto;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 20px;
+    top: 20px;
+    max-height: 250px;
+    color: #000;
+    padding: 20px;
+    text-align: center;
+}
+
+.drag-image h6 {
+    font-size: 20px;
+}
+
+.drag-image span {
+    font-size: 14px;
+}
+
+.drag-image i {
+    font-size: 3rem;
+}
+
+.p-orderlist .p-orderlist-controls {
+    display: none;
+}
+
+.p-orderlist .p-orderlist-list .p-orderlist-item.p-highlight {
+    background: #F4F6F9 !important;
+}
+
+.w-4rem {
+    width: 2rem !important;
+}
+
+.h-4rem {
+    height: 2rem !important;
+}
+
+.p-progress-circle,
+.p-progress-path {
+    fill: white !important;
 }

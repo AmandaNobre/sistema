@@ -1,24 +1,28 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { RequestService } from '../../../services/request.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { IAproveOrReject, IDataForm, IDataFormById, IDataRequisitionById, IDataUser, IOptionsIntegration, IRequisitionSave, IUser } from 'src/app/interface';
+import { FormService } from 'src/app/services/form.service';
+import { UserService } from 'src/app/services/user.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-form-request',
+  styleUrls: ['./form.component.css'],
   templateUrl: './form.component.html'
 })
 
 export class FormComponent {
-  id: number = 0
+  id: string = ''
   type: string = ''
-
+  hierarchy: any = []
+  
   control: UntypedFormGroup = this.fb.group({
     form: '',
-    t1: '',
-    t2: '',
-    t3: ''
   })
 
   controlReject: UntypedFormGroup = this.fb.group({
@@ -26,12 +30,22 @@ export class FormComponent {
     description: ''
   })
 
+  filteredAutoComplete: any[] = [];
 
   form: IForm[] = []
+
+  controlSelected: UntypedFormGroup = this.fb.group({})
+  formSelected: IForm[] = []
+
+  validateForm: boolean = false;
+
+  titleFormSelected: string = ''
+  descriptionFormSelected: string = ''
+  sigleFormSelected: string = ''
+
   formmReject: IForm[] = [
     { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
     { label: 'Descrição: ', col: 'col-lg-12', type: 'text-area', formControl: 'description' },
-
   ]
 
   buttonsStandard: IButtonsStandard[] = []
@@ -43,61 +57,138 @@ export class FormComponent {
   ]
 
   options: IOptions[] = []
-
   visible: boolean = false
   title: string = "Cadastrar"
+  users: IUser[] = []
+
+  userId: string = ''
+
+  formView: any
+
+  infoRequestSale: IOptionsIntegration[] = [
+    { label: "Requisição", value: "requisition" },
+    { label: "Establelecimento", value: "establishment" },
+    { label: "Requisitante", value: "requester" },
+    { label: "Lotação", value: "capacity" },
+    { label: "Data da Requisição", value: "requestData" },
+    { label: "Local de Entrega", value: "deliveryPlace" },
+    { label: "Tipo de Requisição", value: "typeOfRequest" }
+  ]
+
+  infoRequestSaleItens: IOptionsIntegration[] = [
+    { label: "Seq:", value: "seq" },
+    { label: "UM:", value: "um" },
+    { label: "Valor Unitário:", value: "unitValue" },
+    { label: "Item:", value: "item" },
+    { label: "Qtd. requisitada:", value: "qtdRequested" },
+    { label: "Valor Total:", value: "totalValue" },
+    { label: "Qtd. atender:", value: "qtdToMeet" }
+  ]
+
+  infoRequestSaleItensMore: IOptionsIntegration[] = [
+    { label: "Referência:", value: "reference" },
+    { label: "Urgente:", value: "urgent" },
+    { label: "Prioridade:", value: "priority" },
+    { label: "Conta:", value: "account" },
+    { label: "Centro de custo:", value: "costCenter" },
+    { label: "Narrativa:", value: "narrative" },
+    { label: "Data Entrega:", value: "deliveryDate" },
+    { label: "Homologa Fornecedor:", value: "supplierApproval" },
+    { label: "Código Utilização:", value: "codeUsage" },
+    { label: "Ordem invest:", value: "investOrder" },
+    { label: "Afeta Qualidade:", value: "affectsQuality" },
+
+  ]
 
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService,
+    private requestService: RequestService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private formService: FormService,
+    private userService: UserService,
+    private authenticationService: AuthenticationService
   ) {
     this.route.params.subscribe(params => this.id = params['id']);
     this.route.params.subscribe(params => this.type = params['type']);
+    this.userId = JSON.parse(this.authenticationService.getLoggedUser()).id
+  }
+
+  filterAutoComplete(event: { query: any; }) {
+    let filtered: any[] = [];
+    let query = event.query;
+
+    if (this.users) {
+      for (let i = 0; i < this.users.length; i++) {
+        let dados = this.users[i];
+        if (dados.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+          filtered.push(dados);
+        }
+      }
+
+      this.filteredAutoComplete = filtered;
+    }
+  }
+  
+  onChangevalues(event: any, index: any, op: OverlayPanel) {
+    this.hierarchy[index] = { ...this.hierarchy[index], ...event }
+    op.hide();
   }
 
   ngOnInit() {
-    this.service.getAllForms().subscribe(data => {
-      this.options = data as IOptions[]
-      this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
-      ]
-    })
+    if (this.type == "view") {
+      this.title = "Visualizar"
+    }
 
-    if (this.id) {
-      this.service.getById(this.id).subscribe(data => {
-        var form = data as any
-        this.control = this.fb.group({
-          form: form[0].formResponse.form,
-          t1: new FormControl({ value: form[0].formResponse.t1, disabled: this.type == "view" }),
-          t2: new FormControl({ value: form[0].formResponse.t2, disabled: this.type == "view" }),
-          t3: new FormControl({ value: form[0].formResponse.t3, disabled: this.type == "view" })
-        })
-        this.chageValues()
+    this.userService.getAll().subscribe(({ data }: IDataUser) => (
+      this.users = data
+    ))
+
+    const formoptions = new Promise((resolve, reject) => {
+      this.formService.getAll().subscribe(({ data }: IDataForm) => {
+        this.options = data.map(d => ({ ...d, descricao: d.title }))
+        resolve(this.form = [
+          { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
+        ]
+        )
       })
-      this.title = "Editar"
+    });
 
-      if(this.type == "view"){
-        this.title = "Visualizar"
+    Promise.all([formoptions]).then((values) => {
+      if (this.id) {
+        this.requestService.getById(this.id).subscribe(({ data }: IDataRequisitionById) => {
+          this.hierarchy = data.approvers.map(a => ({
+            name: a.approverName
+          }))
+          this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
+          this.chageValues(data.controlResponse)
+
+          if (data.actions.approve) {
+            this.buttonsOptional.push(
+              { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aproveOrCancel("aprovar"), styleClass: "p-button-success p-button-outlined" },
+            )
+          }
+          if (data.actions.reject) {
+            this.buttonsOptional.push(
+              { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-warning p-button-outlined" },
+            )
+          }
+          if (data.actions.cancel) {
+            this.buttonsOptional.push(
+              { label: "Cancelar", icon: "pi pi-times", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
+            )
+          }
+
+        })
+      } else {
+        this.buttonsStandard = [
+          { type: 'cancel', onCLick: () => this.return(), styleClass: 'p-button-outlined' },
+          { type: 'save', onCLick: () => this.saveRequest(), styleClass: 'p-button-outlined' }
+        ]
       }
-
-    }
-
-    if (this.type == 'view') {
-      this.buttonsOptional = [
-        // { label: "Voltar", icon: "pi pi-angle-left", onCLick: () => this.return(), styleClass: "p-button-warning" },
-        { label: "Reprovar", icon: "pi pi-times", onCLick: () => this.reject(), styleClass: "p-button-danger" },
-        { label: "Aprovar", icon: "pi pi-check", onCLick: () => this.aprove(), styleClass: "p-button-success" },
-      ]
-    } else {
-      this.buttonsStandard = [
-        { type: 'cancel', onCLick: () => this.return() },
-        { type: 'save', onCLick: () => this.saveRequest() }
-      ]
-    }
+    });
   }
 
   reject() {
@@ -105,72 +196,116 @@ export class FormComponent {
   }
 
   confirmReject() {
-    var payload = {
-      type: this.control.value.form.descricao,
-      formResponse: this.control.value,
-      user: "teste",
-      status: "Reprovada"
+    var payload: IAproveOrReject = {
+      id: this.id,
+      requisitionId: this.id,
+      approverId: this.userId,
+      requesterId: this.userId
     }
 
-    this.service.editRequest(payload, this.id).subscribe({
+    this.requestService.approveOrReject(payload, "Reject").subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao rejeitar requisição' });
         setTimeout(() => this.return(), 2000);
+      },
+      error: ({ error }) => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
       }
     })
   }
 
-  aprove() {
+  aproveOrCancel(type: string) {
     this.confirmationService.confirm({
-      message: 'Certeza que deseja aprovar solicitação',
+      message: `Certeza que deseja ${type} solicitação`,
       header: 'Confirmação',
       icon: 'pi pi-exclamation-triangle',
       rejectButtonStyleClass: "p-button-text",
       acceptLabel: "Sim",
       rejectLabel: "Não",
       accept: () => {
-        var payload = {
-          type: this.control.value.form.descricao,
-          formResponse: this.control.value,
-          user: "teste",
-          status: "Aprovada"
+        var payload: IAproveOrReject = {
+          id: this.id,
+          requisitionId: this.id,
+          approverId: this.userId,
+          requesterId: this.userId
         }
 
-        this.service.editRequest(payload, this.id).subscribe({
+        this.requestService.approveOrReject(payload, type === "cancelar" ? "Cancel" : "Aprrove").subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: `Sucesso ao ${type} requisição` });
             setTimeout(() => this.return(), 2000);
+          },
+          error: ({ error }) => {
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
           }
         })
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Confirmação aprovada com sucesso!' });
-        setTimeout(() => this.return(), 2000);
-
       }
     });
   }
 
 
-  chageValues() {
-    if (this.control.value.form) {
-      this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-12', type: 'select', options: this.options, formControl: 'form', disabled: this.type == "view" }
-      ]
-      var form = this.control.value.form
-      if (form.id == 2) {
-        this.form.push(
-          { label: 'Nome: ', col: 'col-lg-6', type: 'text', formControl: 't1', disabled: this.type == "view" },
-          { label: 'Descrição: ', col: 'col-lg-6', type: 'text', formControl: 't2', disabled: this.type == "view" },
-        )
-      } else if (form.id == 1) {
-        this.form.push(
-          { label: 'Tipo de Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't1', disabled: this.type == "view" },
-          { label: 'Motivo do Acesso: ', col: 'col-lg-12', type: 'text', formControl: 't2', disabled: this.type == "view" },
-          { label: 'Email: ', col: 'col-lg-12', type: 'text', formControl: 't3', disabled: this.type == "view" },
-        )
-      } else {
+  chageValues(formResponse?: any) {
+    var control = this.control.value.form
+    this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
+      let formValid = {}
+      this.titleFormSelected = data.title
+      this.descriptionFormSelected = data.description
+      this.sigleFormSelected = data.controlCreatedForm.sigle
+      this.formSelected = data.form
+      this.hierarchy = this.hierarchy.length == 0
+        ? data.hierarchy
+        : this.hierarchy.map((h: any, index: number) => ({
+          ...h,
+          ...data.hierarchy[index]
+        }))
 
+      if (formResponse) {
+        this.formSelected.map((form: any) => (
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({ value: formResponse[form.formControl], disabled: true }) })
+        ))
+      } else {
+        this.formSelected.map((form: any) => (
+          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl('', Validators.required) : new FormControl('') })
+        ))
       }
-    }
+
+      this.controlSelected = this.fb.group(formValid)
+
+      if (this.titleFormSelected === "Solicitação de Compra") {
+        this.formView = {
+          itens: [
+            {
+              seq: 123,
+              um: "Teste",
+              unitValue: 140.5,
+              item: "Teste",
+              qtdRequested: 123,
+              totalValue: 140.5,
+              qtdToMeet: 140.5,
+              reference: "Teste",
+              urgent: "Sim",
+              priority: "Alta",
+              account: "Teste",
+              costCenter: "Teste",
+              narrative: "Teste",
+              deliveryDate: '22/01/2024',
+              supplierApproval: "Sim",
+              codeUsage: "Teste",
+              investOrder: 123,
+              affectsQuality: "Sim",
+              customization: "Teste",
+            }
+          ],
+          requisition: "123456789",
+          establishment: "Estabelecimento 1",
+          requester: 'Requisitante 1',
+          capacity: 'Lotação 1',
+          requestData: '22/01/2024',
+          deliveryPlace: 'Local de entega 1',
+          typeOfRequest: 'Solicitação de compras',
+        }
+      }
+    })
   }
 
   clickNew() {
@@ -178,36 +313,55 @@ export class FormComponent {
   }
 
   saveRequest() {
-    var payload = {
-      type: this.control.value.form.descricao,
-      formResponse: this.control.value,
-      user: "teste",
-      status: "Solicitada"
-    }
+    this.validateForm = true
 
+    if (this.controlSelected.status === "VALID") {
+      this.validateForm = false
+      var payload: IRequisitionSave = {
+        requesterId: this.userId,
+        formId: this.control.value.form.id,
+        controlResponse: JSON.stringify(this.controlSelected.value),
+        approvers: this.hierarchy.map((h: { id: any; }) => h.id)
+      }
 
-
-    if (this.id) {
-      this.service.editRequest(payload, this.id).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
-          setTimeout(() => this.return(), 2000);
+      this.requestService.save(payload).subscribe({
+        next: (sucess: any) => {
+          this.confirmationService.confirm({
+            message: `Código da requisição: ${sucess.code}`,
+            acceptLabel: "OK",
+            icon: "pi pi-info-circle",
+            rejectVisible: false,
+            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+            accept: () => {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
+              setTimeout(() => this.return(), 2000);
+            }
+          });
+        },
+        error: ({ error }) => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });
         }
       })
-    } else {
-      this.service.saveRequest(payload).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao cadastrar requisição' });
-          setTimeout(() => this.return(), 2000);
-        }
-      })
     }
-
-
   }
 
   return() {
     this.router.navigate([`/pages/request`], { relativeTo: this.route })
+  }
 
+  seeMore(index: any) {
+    let maisTexto = document.getElementById(`mais${index}`);
+    let btnVermais = document.getElementById(`btnVerMais${index}`);
+
+    if (maisTexto && btnVermais) {
+      if (maisTexto.style.display !== "none") {
+        maisTexto.style.display = "none";
+        btnVermais.innerHTML = `Ver Mais <i class="pi pi-angle-down"></i>`;
+      } else {
+        maisTexto.style.display = "grid";
+        btnVermais.innerHTML = `Ver Menos <i class="pi pi-angle-up"></i>`;
+
+      }
+    }
   }
 }

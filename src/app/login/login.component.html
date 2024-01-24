@@ -1,0 +1,15 @@
+<div class="login">
+    <p-toast></p-toast>
+    <div class="conteudo">
+        <div class="text-aling-center">
+            <p-image src="../../assets/logo_ajaxti.svg" alt="Logo Ajax" width="250"></p-image>
+        </div>
+        <form-dynamic-angular [validateForm]=validateForm [form]=form [control]=control></form-dynamic-angular>
+        <div class="text-aling-center">
+            <p-button (click)="logar()" class="button" styleClass="p-button-outlined">
+                <label *ngIf="!loading"> Entrar</label>
+                <p-progressSpinner *ngIf="loading" fill="#fff" styleClass="w-4rem h-4rem"></p-progressSpinner>
+            </p-button>
+        </div>
+    </div>
+</div>

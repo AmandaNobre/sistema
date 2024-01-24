@@ -11,7 +11,17 @@ import { TableModule } from 'primeng/table';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FormService } from './service/form.service';
+import { FormService } from '../../services/form.service';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { DialogModule } from 'primeng/dialog';
+import { CalendarModule } from 'primeng/calendar';
+import { OrderListModule } from 'primeng/orderlist';
+import { AccordionModule } from 'primeng/accordion';
+import { DividerModule } from 'primeng/divider';
+import { UserService } from '../../services/user.service';
+import { ComponentsModule } from 'src/app/components/components.module';
+import { TitleService } from 'src/app/services/title.service';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -25,6 +35,14 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    DividerModule,
+    AccordionModule,
+    OrderListModule,
+    ButtonModule,
+    CalendarModule,
+    DialogModule,
+    InputSwitchModule,
+    SplitButtonModule,
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
@@ -33,7 +51,8 @@ const routes: Routes = [
     ButtonModule,
     TableModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    ComponentsModule
   ],
   exports: [
     ListComponent,
@@ -42,7 +61,9 @@ const routes: Routes = [
   providers: [
     FormService,
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    UserService,
+    TitleService
   ]
 })
 export class FormModule { }

@@ -1,0 +1,56 @@
+<p-table *ngIf="rows && rows.length > 0" [columns]="cols" [value]="rowsPagination"
+    [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header" let-columns>
+        <tr>
+            <th *ngFor="let col of columns">
+                {{ col.header }}
+            </th>
+            <th *ngIf="buttonsOptional.length > 0">Ações</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+            <td *ngFor="let col of columns">
+                {{ rowData[col.field] }}
+            </td>
+            <td>
+                <p-button *ngFor="let button of buttonsOptional" styleClass={{button.styleClass}}
+                    (click)="button.onCLick(rowData)" pTooltip={{button.label}} [autoHide]="false" placeholder="top"
+                    tooltipPosition="top" icon={{button.icon}}></p-button>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+
+<p-table *ngIf="!rows" [columns]="cols" [value]="rowsSkeleton" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header" let-columns>
+        <tr>
+            <th *ngFor="let col of columns">
+                {{ col.header }}
+            </th>
+            <th *ngIf="buttonsOptional.length > 0">Ações</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr>
+            <td *ngFor="let col of columns">
+                <p-skeleton></p-skeleton>
+            </td>
+            <td *ngIf="buttonsOptional.length > 0">
+                <p-skeleton></p-skeleton>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-paginator *ngIf="rows && rows.length > 0" (onPageChange)="onPageChange($event)" [first]="first"
+    [rows]="rowsPaginator" [totalRecords]="rows.length" [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
+
+
+<div *ngIf="rows && rows.length == 0" class="notFound">
+    <div class="w-100">
+        <p-image src="../../../assets/animations/notFound.gif" alt="Image" width="250"></p-image>
+        <p>Nenhum dado encontrado.</p>
+    </div>
+</div>

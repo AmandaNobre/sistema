@@ -4,16 +4,17 @@ import { RouterModule, Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { ComponentsModule } from '../components/components.module';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { AuthGuard } from '../services/auth.guard.service';
 
 const routes: Routes = [
   {
     path: '',
     component: PagesComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'request', pathMatch: 'full' },
       { path: 'request', loadChildren: () => import('./request/request.module').then(module => module.RequestModule) },
-      { path: 'forms', loadChildren: () => import('./forms/forms.module').then(module => module.FormModule) },
+      { path: 'forms', loadChildren: () => import('./forms/forms.module').then(module => module.FormModule) }
     ]
   }
 ]
@@ -28,6 +29,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     ComponentsModule,
     ToastModule
-  ]
+  ],
+  providers: [AuthGuard]
 })
 export class PagesModule { }

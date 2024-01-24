@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ListComponent } from './list/list.component';
 import { FormComponent } from './form/form.component';
-import { RequestService } from './service/request.service';
+import { RequestService } from '../../services/request.service';
 import { FormDynamicAngularModule } from 'form-dynamic-angular';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -13,6 +13,17 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
+import { FormService } from 'src/app/services/form.service';
+import { UserService } from 'src/app/services/user.service';
+import { OrderListModule } from 'primeng/orderlist';
+import { DropdownModule } from 'primeng/dropdown';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { TabViewModule } from 'primeng/tabview';
+import { ComponentsModule } from 'src/app/components/components.module';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { PanelModule } from 'primeng/panel';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -26,6 +37,13 @@ const routes: Routes = [
     FormComponent
   ],
   imports: [
+    ComponentsModule,
+    TabViewModule,
+    AutoCompleteModule,
+    OverlayPanelModule,
+    DropdownModule,
+    OrderListModule,
+    DividerModule,
     TableModule,
     CommonModule,
     RouterModule.forChild(routes),
@@ -35,7 +53,8 @@ const routes: Routes = [
     ButtonModule,
     ToastModule,
     ConfirmDialogModule,
-    DialogModule
+    DialogModule,
+    PanelModule
   ],
   exports: [
     ListComponent,
@@ -44,7 +63,10 @@ const routes: Routes = [
   providers: [
     RequestService,
     MessageService,
-    ConfirmationService
+    ConfirmationService,
+    FormService,
+    UserService,
+    AuthenticationService
   ]
 })
 export class RequestModule { }

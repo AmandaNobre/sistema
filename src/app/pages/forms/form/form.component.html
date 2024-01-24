@@ -1,5 +1,125 @@
-<div class="page">
-    <p-toast></p-toast>
-    <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandard title="{{title}} Formulário"
-        [form]=form [control]=control></form-dynamic-angular>
+<div>
+    <app-header-forms [buttonsStandard]=buttonsStandard [title]=title></app-header-forms>
+    <div class="page">
+        <p-toast></p-toast>
+        <p-accordion [multiple]="true" [activeIndex]="[0]">
+            <p-accordionTab header="Hierarquia de Aprovação">
+                <form-dynamic-angular [form]=form [control]=control [validateForm]=validateForm></form-dynamic-angular>
+            </p-accordionTab>
+            <p-accordionTab header="Criar Formulário">
+                <form [formGroup]="controlNewForm" class="form-created">
+                    <div id="title">
+                        <h5 *ngIf="controlNewForm">{{controlNewForm.value.titleForm}}</h5>
+                        <span>{{controlNewForm.value.sigle}} - {{controlNewForm.value.description}}</span>
+                    </div>
+                    <div id="editTitle">
+                        <input  type="text" pInputText class="w-100 form-control mb-3"
+                            formControlName="titleForm" />
+                        <div class="d-flex">
+                            <input  type="text" pInputText class="w-100 col-md-3 form-control mb-3"
+                                formControlName="sigle" />
+                            <input  type="text" pInputText class="w-100 form-control mb-3"
+                                formControlName="description" />
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <p-button *ngIf="formCreated.length > 0 " (click)="showDialog()" icon="pi pi-eye"
+                            styleClass="p-button-text p-button-primary" label="Visualizar"></p-button>
+                    </div>
+
+                    <p-orderList id="form" *ngIf="formCreated.length > 0" [value]="formCreated" [dragdrop]="true">
+                        <ng-template let-form let-indexForm="index" pTemplate="item">
+                            <div class="d-flex justify-content-end">
+                                <p-button icon="pi pi-times" styleClass="p-button-text p-button-danger"
+                                    (click)="removeInput(indexForm)"></p-button>
+                            </div>
+                            <div>
+                                <div class="w-100">
+                                    <input type="text" pInputText placeholder="Pergunta" class="w-100 form-control mb-3"
+                                        formControlName="question{{indexForm}}" (change)="changeInput(indexForm)" />
+                                </div>
+
+                                <input *ngIf="form.type == 'text'  || form.type == 'number' " type={{form.type}}
+                                    pInputText placeholder="Resposta" class="w-100 form-control"
+                                    (change)="changeInput(indexForm)" [disabled]="true" />
+
+
+                                <div *ngIf="form.type == 'select' || form.type == 'multi'">
+                                    <div *ngFor="let list of formCreated[indexForm]?.options; let index = index"
+                                        class="d-flex">
+                                        <input value="{{list.descricao}}" type={{form.type}} pInputText
+                                            placeholder="Opção" class="w-100 form-control"
+                                            (change)="change($event, index, indexForm)" />
+                                        <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger"
+                                            class="buttons" (click)="removeOption(index, indexForm)"></p-button>
+                                    </div>
+                                </div>
+
+                                <p-button *ngIf="form.type == 'select' || form.type == 'multi' "
+                                    (click)="addOptionsSelect(indexForm)" icon="pi pi-plus"
+                                    styleClass="p-button-text p-button-primary" label="Adicionar Opção"></p-button>
+
+
+                                <textarea placeholder="Resposta" pInputTextarea (change)="changeInput(indexForm)"
+                                    *ngIf="form.type === 'text-area' " pInputTextarea class="form-control" rows="4"
+                                    [disabled]="true"></textarea>
+
+                                <div *ngIf="form.type === 'date'">
+                                    <p-calendar styleClass="w-100" dateFormat="dd/mm/yy" [disabled]="true"
+                                        placeholder="dd/mm/aaaa" [showIcon]="true"></p-calendar>
+                                </div>
+
+                                <div *ngIf="form.type === 'date-time'">
+                                    <p-calendar styleClass="w-100" dateFormat="dd/mm/yy" [disabled]="true"
+                                        placeholder="dd/mm/aaaa hh:mm" [showIcon]="true" [showTime]="true"></p-calendar>
+                                </div>
+
+                                <div *ngIf="form.type === 'upload-files'" ngx-dropzone class="drag-image">
+                                    <div>
+                                        <div><i class="pi pi-cloud-upload"></i></div>
+                                        <h6>Clique ou arraste e solte um arquivo para anexar</h6>
+                                    </div>
+                                </div>
+
+                                <div class="buttons mt-4">
+                                    <div class="d-flex mr-3">Obrigatório <p-inputSwitch
+                                            formControlName="required{{indexForm}}" (onChange)="changeInput(indexForm)"
+                                            class="ml-3"></p-inputSwitch>
+                                    </div>
+
+                                    <div class="d-flex" *ngIf="form.type == 'text' || form.type == 'text-area'">Resposta
+                                        Longa
+                                        <p-inputSwitch formControlName="longAnswer{{indexForm}}" class="ml-3"
+                                            (onChange)="changeInput(indexForm)"></p-inputSwitch>
+                                    </div>
+
+                                    <div class="d-flex" *ngIf="form.type == 'select' || form.type == 'multi'">Seleção
+                                        Múltipla
+                                        <p-inputSwitch formControlName="multi{{indexForm}}" class="ml-3"
+                                            (onChange)="changeInput(indexForm)"></p-inputSwitch>
+                                    </div>
+
+                                    <div class="d-flex" *ngIf="form.type == 'date' || form.type == 'date-time'">Data e
+                                        Hora<p-inputSwitch formControlName="dateTime{{indexForm}}"
+                                            (onChange)="changeInput(indexForm)" class="ml-3"></p-inputSwitch></div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-orderList>
+
+
+                </form>
+                <p-splitButton  id="form"  label="Adicionar" icon="pi pi-plus" [model]="typesInputs"
+                    styleClass="p-button-primary mb-2  p-button-outlined"></p-splitButton>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+
+    <p-dialog  header="" [(visible)]="visible" [style]="{width: '50vw'}"
+        [maximizable]="true">
+        <form-dynamic-angular *ngIf="formCreated.length > 0" sigle="{{controlNewForm.value.sigle}}"
+            description="{{controlNewForm.value.description}}" title="{{controlNewForm.value.titleForm}}"
+            [form]=formCreated [control]=controlNewForm></form-dynamic-angular>
+    </p-dialog>
+
 </div>

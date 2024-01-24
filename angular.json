@@ -29,16 +29,15 @@
               "node_modules/primeicons/primeicons.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/primeng/resources/primeng.min.css",
-              "./node_modules/primeng/resources/themes/rhea/theme.css",
+              "./node_modules/primeng/resources/themes/lara-light-blue/theme.css",
               "node_modules/admin-lte/plugins/fontawesome-free/css/all.min.css",
               "node_modules/admin-lte/dist/css/adminlte.min.css"
             ],
             "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/admin-lte/plugins/jquery/jquery.min.js",
-              "node_modules/admin-lte/dist/js/adminlte.js"
-            ]
+              "node_modules/admin-lte/dist/js/adminlte.js",
+              "node_modules/admin-lte/plugins/jquery/jquery.js",
+              "node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.js"]
           },
           "configurations": {
             "production": {
@@ -102,16 +101,15 @@
               "node_modules/primeicons/primeicons.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./node_modules/primeng/resources/primeng.min.css",
-              "./node_modules/primeng/resources/themes/rhea/theme.css",
+              "./node_modules/primeng/resources/themes/lara-light-blue/theme.css",
               "node_modules/admin-lte/plugins/fontawesome-free/css/all.min.css",
               "node_modules/admin-lte/dist/css/adminlte.min.css"
             ],
             "scripts": [
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/admin-lte/plugins/jquery/jquery.min.js",
-              "node_modules/admin-lte/dist/js/adminlte.js"
-            ]
+              "node_modules/admin-lte/dist/js/adminlte.js",
+              "node_modules/admin-lte/plugins/jquery/jquery.js",
+              "node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.js"]
           }
         }
       }

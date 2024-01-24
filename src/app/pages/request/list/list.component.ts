@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
-import { RequestService } from '../service/request.service';
+import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
+import { RequestService } from '../../../services/request.service';
+import { FormService } from 'src/app/services/form.service';
+import { IDataForm, IDataUser, IMyRequisitions, IUser, TTitles } from 'src/app/interface';
+import { UserService } from 'src/app/services/user.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-request',
@@ -17,48 +21,72 @@ export class ListComponent implements OnInit {
   form: IForm[] = []
 
   buttonsStandard: IButtonsStandard[] = [
-    { type: 'clean', onCLick: this.clickNew },
-    { type: 'filter', onCLick: () => this.filter() }
+    { type: 'clean', onCLick: () => this.clean(), styleClass: "p-button-outlined" },
+    { type: 'filter', onCLick: () => this.filter(), styleClass: "p-button-outlined" }
+  ]
+
+  buttonsTable: IButtonsOptional[] = [
+    { label: "Visualizar", icon: "pi pi-eye", onCLick: (rowData: any) => this.editOrView(rowData['id'], 'view'), styleClass: "p-button-info p-button-outlined mr-2" },
   ]
 
   cols: any[] = []
   requests: any[] = []
+  requestsFilter: any[] = []
+  users: IUser[] = []
 
- 
+  userId: string = ''
 
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private service: RequestService
+    private service: RequestService,
+    private formService: FormService,
+    private userService: UserService,
+    private authenticationService: AuthenticationService
   ) {
- 
+    this.userId = JSON.parse(this.authenticationService.getLoggedUser()).id
   }
 
   ngOnInit() {
 
-    this.service.getAllForms().subscribe(data => {
 
+    this.userService.getAll().subscribe(({ data }: IDataUser) => (
+      this.users = data
+    ))
+
+    this.formService.getAll().subscribe(({ data }: IDataForm) => {
+      var options = data.map(d => ({ ...d, descricao: d.title }))
       this.form = [
-        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: data as IOptions[], formControl: 'form' }
+        { label: 'Tipo de Solicitação', col: 'col-lg-6', type: 'select', options: options, formControl: 'form' }
       ]
     })
 
     this.cols = [
-      { field: 'type', header: 'Tipo de formulário' },
-      { field: 'user', header: 'Usuário' },
+      { field: 'title', header: 'Tipo de formulário' },
+      { field: 'requesterName', header: 'Usuário' },
       { field: 'status', header: 'Status' }
     ];
 
-    this.service.getAllRequests().subscribe(data => {
-      this.requests = data as any[]
+    this.getAll()
+  }
+
+  getAll() {
+    this.service.getMyRequisitions(this.userId).subscribe(({ data }: IMyRequisitions) => {
+      const titles: TTitles = Object.keys(data) as TTitles
+      const requestAll = titles.map((t) => ({
+        title: t,
+        table: data[t].map(d => ({
+          ...d
+        }))
+      }))
+      this.requests = requestAll
+      this.requestsFilter = requestAll
     })
   }
 
   filter() {
-    this.service.filter(this.control.value.form.descricao).subscribe(data => {
-      this.requests = data as any[]
-    })
+    this.requestsFilter = this.requests.map(t => ({ ...t, table: t.table.filter((r: { customFormId: any; }) => r.customFormId === this.control.value.form.id) }))
   }
 
   clickNew() {
@@ -70,5 +98,12 @@ export class ListComponent implements OnInit {
     this.router.navigate([`${type}/${id}`], { relativeTo: this.route })
   }
 
+
+  clean() {
+    this.control = this.fb.group({
+      form: '',
+    })
+    this.getAll()
+  }
 
 }
