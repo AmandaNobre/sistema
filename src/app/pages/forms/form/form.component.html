@@ -13,12 +13,12 @@
                         <span>{{controlNewForm.value.sigle}} - {{controlNewForm.value.description}}</span>
                     </div>
                     <div id="editTitle">
-                        <input id="inputTitle" type="text" pInputText class="w-100 form-control mb-3"
+                        <input  type="text" pInputText class="w-100 form-control mb-3"
                             formControlName="titleForm" />
                         <div class="d-flex">
-                            <input id="inputTitle" type="text" pInputText class="w-100 col-md-3 form-control mb-3"
+                            <input  type="text" pInputText class="w-100 col-md-3 form-control mb-3"
                                 formControlName="sigle" />
-                            <input id="inputTitle" type="text" pInputText class="w-100 form-control mb-3"
+                            <input  type="text" pInputText class="w-100 form-control mb-3"
                                 formControlName="description" />
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                             styleClass="p-button-text p-button-primary" label="Visualizar"></p-button>
                     </div>
 
-                    <p-orderList *ngIf="formCreated.length > 0" [value]="formCreated" [dragdrop]="true">
+                    <p-orderList id="form" *ngIf="formCreated.length > 0" [value]="formCreated" [dragdrop]="true">
                         <ng-template let-form let-indexForm="index" pTemplate="item">
                             <div class="d-flex justify-content-end">
                                 <p-button icon="pi pi-times" styleClass="p-button-text p-button-danger"
@@ -109,13 +109,13 @@
 
 
                 </form>
-                <p-splitButton label="Adicionar" icon="pi pi-plus" [model]="typesInputs"
+                <p-splitButton  id="form"  label="Adicionar" icon="pi pi-plus" [model]="typesInputs"
                     styleClass="p-button-primary mb-2  p-button-outlined"></p-splitButton>
             </p-accordionTab>
         </p-accordion>
     </div>
 
-    <p-dialog [contentStyle]="{'overflow': 'visible'}" header="" [(visible)]="visible" [style]="{width: '50vw'}"
+    <p-dialog  header="" [(visible)]="visible" [style]="{width: '50vw'}"
         [maximizable]="true">
         <form-dynamic-angular *ngIf="formCreated.length > 0" sigle="{{controlNewForm.value.sigle}}"
             description="{{controlNewForm.value.description}}" title="{{controlNewForm.value.titleForm}}"

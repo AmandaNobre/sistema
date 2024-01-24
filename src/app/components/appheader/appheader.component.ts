@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
@@ -10,7 +11,8 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 export class AppheaderComponent implements OnInit {
 
   constructor(
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private router: Router
   ) { }
 
   user: string = ''
@@ -22,5 +24,7 @@ export class AppheaderComponent implements OnInit {
 
   logout() {
     this.authenticationService.loggout()
+    this.router.navigate(['/login']);
+
   }
 }

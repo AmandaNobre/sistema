@@ -45,7 +45,7 @@ export class AuthenticationService {
 
     loggout() {
         localStorage.removeItem(environment.user)
-        location.reload()
+        // location.reload()
     }
 
     isAuthenticated(): boolean {

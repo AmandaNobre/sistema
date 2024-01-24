@@ -94,7 +94,7 @@ export class FormComponent {
 
     $(function () {
       $("body").on("click", function (e: { target: any; }) {
-        document.getElementById('inputTitle')?.addEventListener('blur', function () {
+        document.getElementById('form')?.addEventListener('click', function () {
           $('#title').show();
           $('#editTitle').hide();
         });
@@ -103,7 +103,7 @@ export class FormComponent {
 
     this.form = [
       { label: 'Tipo de Aprovador', col: 'col-md-10', type: 'select', formControl: 'type', disabled: this.type == "view", required: true },
-      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button',  class: "mt-3 p-button-outlined", disabled: this.type == "view" },
+      { label: 'Adicionar', onCLick: () => this.add(), col: 'col-md-2', type: 'button', class: "mt-3 p-button-outlined", disabled: this.type == "view" },
     ]
 
     if (this.id) {
@@ -204,14 +204,21 @@ export class FormComponent {
       ["list" + count]: [],
     })
 
+    const standard = {
+      col: 'col-lg-12',
+      type: type,
+      label: '',
+      formControl: '',
+      required: false,
+      options: [],
+    }
+
+    const accept = {
+      acceptFiles: "image/*, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf, application/msword"
+    }
+
     this.formCreated.push(
-      {
-        col: 'col-lg-12', type: type,
-        label: '',
-        formControl: '',
-        required: false,
-        options: []
-      }
+      type === "upload-files" ? { ...standard, ...accept } : { ...standard }
     )
 
     this.addLocalStorage()

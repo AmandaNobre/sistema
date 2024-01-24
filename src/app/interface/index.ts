@@ -104,7 +104,8 @@ export interface IDataRequisitionById {
 export interface IAproveOrReject {
     approverId: string,
     requisitionId: string,
-    id: string
+    id: string,
+    requesterId: string
 }
 
 export interface IMyRequisitions {

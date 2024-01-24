@@ -20,7 +20,8 @@ export class RequestInterceptor implements HttpInterceptor {
 
     constructor(
         private authenticationService: AuthenticationService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private router: Router
     ) {
     }
 
@@ -31,27 +32,27 @@ export class RequestInterceptor implements HttpInterceptor {
         })
         if (tokenResponse) {
             this.authenticationService.setAuth(tokenResponse)
-            // window.location.reload()
+            window.location.reload()
         }
     }
-    
+
     intercept(
         request: HttpRequest<unknown>,
         next: HttpHandler
     ): Observable<HttpEvent<unknown>> {
 
-        //   if (this.authenticationService.tokenHasExpired()) {
-        //     // this.getRefreshToken()
-        //     this.authenticationService.loggout()
-        //   }
+        if (this.authenticationService.tokenHasExpired()) {
+            // this.getRefreshToken()
+            this.authenticationService.loggout()
+            this.router.navigate(['/login']);
+
+        }
 
         if (this.activeRequests === 0) {
             // this.loadingService.show();
         }
 
         this.activeRequests++;
-
-
 
         request = request.clone({
             setHeaders: {

@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IButtonsOptional, IButtonsStandard, IForm, IOptions } from 'form-dynamic-angular';
 import { RequestService } from '../../../services/request.service';
@@ -20,6 +20,7 @@ export class FormComponent {
   id: string = ''
   type: string = ''
   hierarchy: any = []
+  
   control: UntypedFormGroup = this.fb.group({
     form: '',
   })
@@ -176,7 +177,7 @@ export class FormComponent {
           }
           if (data.actions.cancel) {
             this.buttonsOptional.push(
-              { label: "Cancelar", icon: "pi pi-close", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
+              { label: "Cancelar", icon: "pi pi-times", onCLick: () => this.aproveOrCancel("cancelar"), styleClass: "p-button-danger p-button-outlined" },
             )
           }
 
@@ -198,12 +199,13 @@ export class FormComponent {
     var payload: IAproveOrReject = {
       id: this.id,
       requisitionId: this.id,
-      approverId: this.userId
+      approverId: this.userId,
+      requesterId: this.userId
     }
 
     this.requestService.approveOrReject(payload, "Reject").subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao rejeitar requisição' });
         setTimeout(() => this.return(), 2000);
       },
       error: ({ error }) => {
@@ -224,12 +226,13 @@ export class FormComponent {
         var payload: IAproveOrReject = {
           id: this.id,
           requisitionId: this.id,
-          approverId: this.userId
+          approverId: this.userId,
+          requesterId: this.userId
         }
 
-        this.requestService.approveOrReject(payload, "Reject").subscribe({
+        this.requestService.approveOrReject(payload, type === "cancelar" ? "Cancel" : "Aprrove").subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Sucesso ao editar requisição' });
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: `Sucesso ao ${type} requisição` });
             setTimeout(() => this.return(), 2000);
           },
           error: ({ error }) => {

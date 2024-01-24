@@ -14,7 +14,7 @@
                     <label>{{hierarchy.titleDescription}}</label> {{hierarchy.name}}
                     <p-button *ngIf="!hierarchy.name" (click)="op.toggle($event)"
                         styleClass="p-button-text p-button-primary" icon="pi pi-plus"></p-button>
-                    <p-button *ngIf="hierarchy.name" (click)="op.toggle($event)"
+                    <p-button *ngIf="hierarchy.name && type !== 'view'" (click)="op.toggle($event)"
                         styleClass="p-button-text p-button-primary" icon="pi pi-pencil"></p-button>
                     <p-overlayPanel #op [style]="{ width: '450px' }" [showCloseIcon]="true">
                         <p-autoComplete styleClass="w-100" [inputStyle]="{'width':'100%'}"
