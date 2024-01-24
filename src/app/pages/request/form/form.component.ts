@@ -131,7 +131,7 @@ export class FormComponent {
       this.filteredAutoComplete = filtered;
     }
   }
-
+  
   onChangevalues(event: any, index: any, op: OverlayPanel) {
     this.hierarchy[index] = { ...this.hierarchy[index], ...event }
     op.hide();
