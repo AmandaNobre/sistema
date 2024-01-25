@@ -9,3 +9,8 @@
 .title {
     font-size: 21px;
 }
+
+.header-forms{
+    display: flex;
+    justify-content: space-between;
+}

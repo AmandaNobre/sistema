@@ -7,7 +7,7 @@ import {
     HttpResponse,
 } from '@angular/common/http';
 import { Injector } from '@angular/core'
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { catchError, EMPTY, finalize, Observable, throwError } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -21,7 +21,8 @@ export class RequestInterceptor implements HttpInterceptor {
     constructor(
         private authenticationService: AuthenticationService,
         private messageService: MessageService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {
     }
 
@@ -44,8 +45,7 @@ export class RequestInterceptor implements HttpInterceptor {
         if (this.authenticationService.tokenHasExpired()) {
             // this.getRefreshToken()
             this.authenticationService.loggout()
-            this.router.navigate(['/login']);
-
+            this.router.navigate([`/login`], { relativeTo: this.route, queryParams: { to: location.pathname } })
         }
 
         if (this.activeRequests === 0) {

@@ -20,7 +20,6 @@ export class FormComponent {
   id: string = ''
   type: string = ''
   hierarchy: any = []
-  
   control: UntypedFormGroup = this.fb.group({
     form: '',
   })
@@ -63,7 +62,38 @@ export class FormComponent {
 
   userId: string = ''
 
-  formView: any
+  formView: any = {
+    itens: [
+      {
+        seq: 123,
+        um: "Teste",
+        unitValue: 140.5,
+        item: "Teste",
+        qtdRequested: 123,
+        totalValue: 140.5,
+        qtdToMeet: 140.5,
+        reference: "Teste",
+        urgent: "Sim",
+        priority: "Alta",
+        account: "Teste",
+        costCenter: "Teste",
+        narrative: "Teste",
+        deliveryDate: '22/01/2024',
+        supplierApproval: "Sim",
+        codeUsage: "Teste",
+        investOrder: 123,
+        affectsQuality: "Sim",
+        customization: "Teste",
+      }
+    ],
+    requisition: "123456789",
+    establishment: "Estabelecimento 1",
+    requester: 'Requisitante 1',
+    capacity: 'Lotação 1',
+    requestData: '22/01/2024',
+    deliveryPlace: 'Local de entega 1',
+    typeOfRequest: 'Solicitação de compras',
+  }
 
   infoRequestSale: IOptionsIntegration[] = [
     { label: "Requisição", value: "requisition" },
@@ -163,7 +193,7 @@ export class FormComponent {
             name: a.approverName
           }))
           this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
-          this.chageValues(data.controlResponse)
+          this.chageValues(data.controlResponse, data.customFormSnapshot)
 
           if (data.actions.approve) {
             this.buttonsOptional.push(
@@ -244,14 +274,28 @@ export class FormComponent {
   }
 
 
-  chageValues(formResponse?: any) {
+  chageValues(formResponse?: any, customFormSnapshot?: any) {
     var control = this.control.value.form
-    this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
+    var data: any
+
+    const dataPromise = new Promise((resolve, reject) => {
+
+      if (control) {
+        this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
+          resolve(data = data)
+        })
+      } else {
+        resolve(data = customFormSnapshot)
+      }
+    });
+
+    Promise.all([dataPromise]).then((values) => {
+      data = values[0]
       let formValid = {}
       this.titleFormSelected = data.title
       this.descriptionFormSelected = data.description
       this.sigleFormSelected = data.controlCreatedForm.sigle
-      this.formSelected = data.form
+      this.formSelected = data.form.map((f: { type: string; }) => f.type === "upload-files" ? { ...f, disabled: true } : f)
       this.hierarchy = this.hierarchy.length == 0
         ? data.hierarchy
         : this.hierarchy.map((h: any, index: number) => ({
@@ -271,40 +315,6 @@ export class FormComponent {
 
       this.controlSelected = this.fb.group(formValid)
 
-      if (this.titleFormSelected === "Solicitação de Compra") {
-        this.formView = {
-          itens: [
-            {
-              seq: 123,
-              um: "Teste",
-              unitValue: 140.5,
-              item: "Teste",
-              qtdRequested: 123,
-              totalValue: 140.5,
-              qtdToMeet: 140.5,
-              reference: "Teste",
-              urgent: "Sim",
-              priority: "Alta",
-              account: "Teste",
-              costCenter: "Teste",
-              narrative: "Teste",
-              deliveryDate: '22/01/2024',
-              supplierApproval: "Sim",
-              codeUsage: "Teste",
-              investOrder: 123,
-              affectsQuality: "Sim",
-              customization: "Teste",
-            }
-          ],
-          requisition: "123456789",
-          establishment: "Estabelecimento 1",
-          requester: 'Requisitante 1',
-          capacity: 'Lotação 1',
-          requestData: '22/01/2024',
-          deliveryPlace: 'Local de entega 1',
-          typeOfRequest: 'Solicitação de compras',
-        }
-      }
     })
   }
 

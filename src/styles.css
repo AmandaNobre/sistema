@@ -43,7 +43,8 @@ body {
 @media (max-width: 440px) {
 
     .top-page,
-    .form-created .buttons {
+    .form-created .buttons,
+    .header-forms {
         display: block !important;
     }
 

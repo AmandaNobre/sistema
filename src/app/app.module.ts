@@ -27,11 +27,6 @@ const routes: Routes = [
     BrowserAnimationsModule
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
     AuthenticationService,
     MessageService,
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
