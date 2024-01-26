@@ -24,6 +24,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { PanelModule } from 'primeng/panel';
+import { FileService } from 'src/app/services/file.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -54,7 +56,8 @@ const routes: Routes = [
     ToastModule,
     ConfirmDialogModule,
     DialogModule,
-    PanelModule
+    PanelModule,
+    TooltipModule
   ],
   exports: [
     ListComponent,
@@ -66,7 +69,8 @@ const routes: Routes = [
     ConfirmationService,
     FormService,
     UserService,
-    AuthenticationService
+    AuthenticationService,
+    FileService
   ]
 })
 export class RequestModule { }

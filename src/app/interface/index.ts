@@ -20,6 +20,24 @@ export interface IDataUser {
     data: Array<IUser>
 }
 
+// approvers 
+export interface IAttachments {
+    fileName: string,
+    id: string,
+    contentType: string
+}
+
+
+export interface IApprovers {
+    approverId: string,
+    approverName: string,
+    flowAction: number
+    flowActionDescription: string,
+    executedAt: string,
+    comment: string,
+    attachments: Array<IAttachments>
+}
+
 // Title
 export interface ITitle {
     description: string,
@@ -70,6 +88,8 @@ export interface IDataFormById {
     data: IForm
 }
 
+
+
 // requisition
 export interface IRequisitionSave {
     requesterId: string,
@@ -84,7 +104,8 @@ export interface IRequisition {
     customFormId: string,
     controlResponse: string,
     customFormSnapshot: any,
-    approvers: Array<any>,
+    approvers: Array<IApprovers>,
+    title: string,
     status: number,
     requester: string,
     customForm: string,
