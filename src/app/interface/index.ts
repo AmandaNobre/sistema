@@ -1,7 +1,7 @@
 import { IOptions } from "form-dynamic-angular"
 
 // geral
-export interface IOptionsIntegration{
+export interface IOptionsIntegration {
     label: string,
     value: string
 }
@@ -83,7 +83,7 @@ export interface IRequisition {
     requesterId: string,
     customFormId: string,
     controlResponse: string,
-    customFormSnapshot: string,
+    customFormSnapshot: any,
     approvers: Array<any>,
     status: number,
     requester: string,
@@ -105,7 +105,9 @@ export interface IAproveOrReject {
     approverId: string,
     requisitionId: string,
     id: string,
-    requesterId: string
+    requesterId: string,
+    comment: string,
+    attachments: Array<File>
 }
 
 export interface IMyRequisitions {

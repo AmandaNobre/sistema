@@ -4,8 +4,8 @@
     <app-header-forms [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"
         title="{{title}} Solicitação"></app-header-forms>
 
-    <div class="page" *ngIf="titleFormSelected !== 'Solicitação de Compra'">
-        <form-dynamic-angular (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
+    <div class="page">
+        <form-dynamic-angular *ngIf="!id" (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
 
         <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="!id">
             <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
@@ -34,14 +34,14 @@
         </p-dialog>
     </div>
 
-    <div class="page mt-100" *ngIf="formSelected.length > 0">
-        <div *ngIf="titleFormSelected == 'Solicitação de Compra'">
-            <div *ngFor="let input of infoRequestSale">
-                <span class="text-bold">{{input.label}}</span>
-                <p>{{formView[input.value]}}</p>
+    <div class="page mt-100">
+        <div *ngIf="id">
+            <div *ngFor="let input of formView">
+                <span class="text-bold">{{getKey(input)}}</span>
+                <p>{{input[getKey(input)]}}</p>
             </div>
             <div>
-                <span class="titleItens">Itens</span>
+                <!-- <span class="titleItens">Itens</span> -->
                 <div *ngFor="let product of formView.itens; let i = index" class="products">
                     <div class="d-grid">
                         <div *ngFor="let input of infoRequestSaleItens">
@@ -62,9 +62,9 @@
             </div>
         </div>
 
-        <form-dynamic-angular *ngIf="titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
-            title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}"
-            [form]=formSelected [control]=controlSelected></form-dynamic-angular>
+        <form-dynamic-angular *ngIf="!id" [validateForm]=validateForm title="{{titleFormSelected}}"
+            sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}" [form]=formSelected
+            [control]=controlSelected></form-dynamic-angular>
     </div>
 
 </div>

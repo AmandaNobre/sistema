@@ -43,7 +43,9 @@ export class FormComponent {
   sigleFormSelected: string = ''
 
   formmReject: IForm[] = [
-    { label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files' },
+    {
+      label: 'Anexos: ', col: 'col-lg-12', type: 'upload-files', formControl: 'files', acceptFiles: "image/*, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf, application/msword"
+    },
     { label: 'Descrição: ', col: 'col-lg-12', type: 'text-area', formControl: 'description' },
   ]
 
@@ -51,8 +53,8 @@ export class FormComponent {
   buttonsOptional: IButtonsOptional[] = []
 
   buttonsStandardReject: IButtonsStandard[] = [
-    { type: 'cancel', onCLick: () => this.return() },
-    { type: 'save', onCLick: () => this.confirmReject() }
+    { type: 'cancel', onCLick: () => this.return(), styleClass: "p-button-outlined" },
+    { type: 'save', onCLick: () => this.confirmReject(), styleClass: "p-button-outlined" }
   ]
 
   options: IOptions[] = []
@@ -62,40 +64,10 @@ export class FormComponent {
 
   userId: string = ''
 
-  formView: any = {
-    itens: [
-      {
-        seq: 123,
-        um: "Teste",
-        unitValue: 140.5,
-        item: "Teste",
-        qtdRequested: 123,
-        totalValue: 140.5,
-        qtdToMeet: 140.5,
-        reference: "Teste",
-        urgent: "Sim",
-        priority: "Alta",
-        account: "Teste",
-        costCenter: "Teste",
-        narrative: "Teste",
-        deliveryDate: '22/01/2024',
-        supplierApproval: "Sim",
-        codeUsage: "Teste",
-        investOrder: 123,
-        affectsQuality: "Sim",
-        customization: "Teste",
-      }
-    ],
-    requisition: "123456789",
-    establishment: "Estabelecimento 1",
-    requester: 'Requisitante 1',
-    capacity: 'Lotação 1',
-    requestData: '22/01/2024',
-    deliveryPlace: 'Local de entega 1',
-    typeOfRequest: 'Solicitação de compras',
-  }
+  isFormExternal: boolean = false
+  formView: any = {}
 
-  infoRequestSale: IOptionsIntegration[] = [
+  viewInputs: IOptionsIntegration[] = [
     { label: "Requisição", value: "requisition" },
     { label: "Establelecimento", value: "establishment" },
     { label: "Requisitante", value: "requester" },
@@ -161,10 +133,14 @@ export class FormComponent {
       this.filteredAutoComplete = filtered;
     }
   }
-  
+
   onChangevalues(event: any, index: any, op: OverlayPanel) {
     this.hierarchy[index] = { ...this.hierarchy[index], ...event }
     op.hide();
+  }
+
+  getKey(object: any) {
+    return Object.keys(object)[0]
   }
 
   ngOnInit() {
@@ -193,7 +169,13 @@ export class FormComponent {
             name: a.approverName
           }))
           this.control.controls['form'].setValue(this.options.filter(o => o.id === data.customFormId)[0])
-          this.chageValues(data.controlResponse, data.customFormSnapshot)
+
+          this.formView = data.controlResponse
+
+          if (!data.customFormId) {
+            this.isFormExternal = true
+          }
+
 
           if (data.actions.approve) {
             this.buttonsOptional.push(
@@ -221,6 +203,10 @@ export class FormComponent {
     });
   }
 
+  istypeof(text: string) {
+    return typeof (text)
+  }
+
   reject() {
     this.visible = true;
   }
@@ -230,7 +216,9 @@ export class FormComponent {
       id: this.id,
       requisitionId: this.id,
       approverId: this.userId,
-      requesterId: this.userId
+      requesterId: this.userId,
+      comment: this.controlReject.value.description,
+      attachments: this.controlReject.value.files
     }
 
     this.requestService.approveOrReject(payload, "Reject").subscribe({
@@ -257,10 +245,12 @@ export class FormComponent {
           id: this.id,
           requisitionId: this.id,
           approverId: this.userId,
-          requesterId: this.userId
+          requesterId: this.userId,
+          comment: this.controlReject.value.description,
+          attachments: this.controlReject.value.files
         }
 
-        this.requestService.approveOrReject(payload, type === "cancelar" ? "Cancel" : "Aprrove").subscribe({
+        this.requestService.approveOrReject(payload, type === "cancelar" ? "Cancel" : "Approve").subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: `Sucesso ao ${type} requisição` });
             setTimeout(() => this.return(), 2000);
@@ -274,19 +264,14 @@ export class FormComponent {
   }
 
 
-  chageValues(formResponse?: any, customFormSnapshot?: any) {
+  chageValues() {
     var control = this.control.value.form
     var data: any
 
     const dataPromise = new Promise((resolve, reject) => {
-
-      if (control) {
-        this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
-          resolve(data = data)
-        })
-      } else {
-        resolve(data = customFormSnapshot)
-      }
+      this.formService.getById(control.id).subscribe(({ data }: IDataFormById) => {
+        resolve(data = data)
+      })
     });
 
     Promise.all([dataPromise]).then((values) => {
@@ -295,7 +280,7 @@ export class FormComponent {
       this.titleFormSelected = data.title
       this.descriptionFormSelected = data.description
       this.sigleFormSelected = data.controlCreatedForm.sigle
-      this.formSelected = data.form.map((f: { type: string; }) => f.type === "upload-files" ? { ...f, disabled: true } : f)
+      this.formSelected = data.form
       this.hierarchy = this.hierarchy.length == 0
         ? data.hierarchy
         : this.hierarchy.map((h: any, index: number) => ({
@@ -303,15 +288,9 @@ export class FormComponent {
           ...data.hierarchy[index]
         }))
 
-      if (formResponse) {
-        this.formSelected.map((form: any) => (
-          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl({ value: formResponse[form.formControl], disabled: true }, Validators.required) : new FormControl({ value: formResponse[form.formControl], disabled: true }) })
-        ))
-      } else {
-        this.formSelected.map((form: any) => (
-          formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl('', Validators.required) : new FormControl('') })
-        ))
-      }
+      this.formSelected.map((form: any) => (
+        formValid = Object.assign(formValid, { [form.formControl]: form.required ? new FormControl('', Validators.required) : new FormControl('') })
+      ))
 
       this.controlSelected = this.fb.group(formValid)
 
@@ -327,10 +306,18 @@ export class FormComponent {
 
     if (this.controlSelected.status === "VALID") {
       this.validateForm = false
+      let controlResponseFormated: any[] = []
+      this.formSelected.map(f => {
+        let value = this.controlSelected.value[f.formControl ?? ""]
+        controlResponseFormated.push({
+          [f.label ?? ""]: typeof (value) == 'object' ? value.descricao : value
+        })
+      })
+
       var payload: IRequisitionSave = {
         requesterId: this.userId,
         formId: this.control.value.form.id,
-        controlResponse: JSON.stringify(this.controlSelected.value),
+        controlResponse: JSON.stringify(controlResponseFormated),
         approvers: this.hierarchy.map((h: { id: any; }) => h.id)
       }
 
