@@ -1,19 +1,28 @@
 import { Component } from '@angular/core';
 import { FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { IButtonsOptional, IButtonsStandard, IForm } from 'form-dynamic-angular';
+import { IButtonsOptional, IForm } from 'form-dynamic-angular';
 import { IAuth } from '../interface';
 import { LoginService } from '../services/login.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { error } from 'jquery';
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
+
 export class LoginComponent {
+
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.logar()
+    }
+  }
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -52,7 +61,15 @@ export class LoginComponent {
         next: (data: IAuth) => {
           this.loading = false
           this.authenticationService.setAuth(JSON.stringify(data))
-          this.router.navigate([`/pages`], { relativeTo: this.route })
+
+          this.route.queryParamMap.subscribe(({ params }: any) => {
+            if (params.to) {
+              this.router.navigate([params.to], { relativeTo: this.route })
+            } else {
+              this.router.navigate([`/pages`], { relativeTo: this.route })
+            }
+          })
+
         },
         error: ({ error }) => {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.Extensions.erroDetail.Message });

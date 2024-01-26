@@ -5,6 +5,8 @@ import { PagesComponent } from './pages.component';
 import { ComponentsModule } from '../components/components.module';
 import { ToastModule } from 'primeng/toast';
 import { AuthGuard } from '../services/auth.guard.service';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'src/interceptors/request.interceptor';
 
 const routes: Routes = [
   {
@@ -30,6 +32,13 @@ const routes: Routes = [
     ComponentsModule,
     ToastModule
   ],
-  providers: [AuthGuard]
+  providers: [
+    AuthGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true,
+    },
+  ]
 })
 export class PagesModule { }

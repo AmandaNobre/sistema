@@ -1,7 +1,7 @@
 import { IOptions } from "form-dynamic-angular"
 
 // geral
-export interface IOptionsIntegration{
+export interface IOptionsIntegration {
     label: string,
     value: string
 }
@@ -18,6 +18,24 @@ export interface IUser {
 
 export interface IDataUser {
     data: Array<IUser>
+}
+
+// approvers 
+export interface IAttachments {
+    fileName: string,
+    id: string,
+    contentType: string
+}
+
+
+export interface IApprovers {
+    approverId: string,
+    approverName: string,
+    flowAction: number
+    flowActionDescription: string,
+    executedAt: string,
+    comment: string,
+    attachments: Array<IAttachments>
 }
 
 // Title
@@ -70,6 +88,8 @@ export interface IDataFormById {
     data: IForm
 }
 
+
+
 // requisition
 export interface IRequisitionSave {
     requesterId: string,
@@ -83,8 +103,9 @@ export interface IRequisition {
     requesterId: string,
     customFormId: string,
     controlResponse: string,
-    customFormSnapshot: string,
-    approvers: Array<any>,
+    customFormSnapshot: any,
+    approvers: Array<IApprovers>,
+    title: string,
     status: number,
     requester: string,
     customForm: string,
@@ -105,7 +126,9 @@ export interface IAproveOrReject {
     approverId: string,
     requisitionId: string,
     id: string,
-    requesterId: string
+    requesterId: string,
+    comment: string,
+    attachments: Array<File>
 }
 
 export interface IMyRequisitions {

@@ -4,10 +4,14 @@
     <app-header-forms [buttonsStandard]="buttonsStandard" [buttonsOptional]="buttonsOptional"
         title="{{title}} Solicitação"></app-header-forms>
 
-    <div class="page" *ngIf="titleFormSelected !== 'Solicitação de Compra'">
-        <form-dynamic-angular (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
+    <div class="page">
 
-        <p-orderList *ngIf="hierarchy.length > 0" [value]="hierarchy" header="Hierarquia de Aprovação" [dragdrop]="!id">
+        <!-- create  -->
+
+        <form-dynamic-angular *ngIf="!id" (onChange)=chageValues() [form]=form [control]=control></form-dynamic-angular>
+
+        <p-orderList *ngIf="hierarchy.length > 0 && !id" [value]="hierarchy" header="Hierarquia de Aprovação"
+            [dragdrop]="!id">
             <ng-template let-hierarchy pTemplate="item" let-indexHierarchy="index">
                 <div class="flex flex-wrap p-2 align-items-center gap-3">
 
@@ -27,44 +31,93 @@
             </ng-template>
         </p-orderList>
 
-        <p-dialog [maximizable]="true" header="Rejeitar Solicitação" [(visible)]="visible"
+        <p-dialog [maximizable]="true" header="{{action}} Solicitação" [(visible)]="visible"
             [style]="{ width: '90vw', height: '500px' }">
-            <form-dynamic-angular (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
-                [control]=controlReject></form-dynamic-angular>
+            <form-dynamic-angular  [validateForm]=validateFormReject  (onChange)=chageValues() [buttonsStandard]=buttonsStandardReject [form]=formmReject
+                [control]=controlReject ></form-dynamic-angular>
         </p-dialog>
+
+
+        <!-- view  -->
+
+        <div *ngIf="id">
+            <span class="text-bold">Aprovadores</span>
+            <div *ngFor="let approver of hierarchy" class="d-flex align-items-center">
+                <p class="mr-2">{{approver.approverName}}</p>
+                <p>
+                    <p-button (click)="viewApprover(info, $event, approver)" styleClass="p-button-text p-button-primary"
+                        icon="pi pi-info-circle" pTooltip="informações" [autoHide]="false" placeholder="top"
+                        tooltipPosition="top"></p-button>
+                </p>
+            </div>
+        </div>
+
+        <p-overlayPanel #info [style]="{ width: '450px' }" [showCloseIcon]="true">
+            <div *ngIf="approverSelected">
+                <label>{{approverSelected.flowActionDescription}} - {{approverSelected.executedAt}}</label>
+                <div *ngIf="approverSelected.comment">
+                    <label>Comentário</label>
+                    <p>{{approverSelected.comment}}</p>
+                </div>
+                <div *ngIf="approverSelected.attachments.length > 0">
+                    <label>Arquivos</label>
+                    <div *ngFor="let file of approverSelected.attachments" class="d-flex align-items-center">
+                        <p>{{file.fileName}}</p>
+                        <p>
+                            <p-button (click)="downloadFile($event, file)" styleClass="p-button-text p-button-primary"
+                                icon="pi pi-download"></p-button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </p-overlayPanel>
+
     </div>
 
-    <div class="page mt-100" *ngIf="formSelected.length > 0">
-        <div *ngIf="titleFormSelected == 'Solicitação de Compra'">
-            <div *ngFor="let input of infoRequestSale">
-                <span class="text-bold">{{input.label}}</span>
-                <p>{{formView[input.value]}}</p>
+    <div class="page mt-100">
+
+        <!-- view  -->
+        <div *ngIf="id">
+            <span>{{titleFormSelected}}</span>
+            <div *ngIf="sigleFormSelected && descriptionFormSelected" class="d-flex subtitle">
+                <span>{{sigleFormSelected}}</span> <span>-</span><span>{{descriptionFormSelected}}</span>
             </div>
-            <div>
-                <span class="titleItens">Itens</span>
-                <div *ngFor="let product of formView.itens; let i = index" class="products">
-                    <div class="d-grid">
-                        <div *ngFor="let input of infoRequestSaleItens">
-                            <span class="text-bold">{{input.label}} </span>
-                            <span>{{product[input.value]}}</span>
+            <p-divider></p-divider>
+            <div *ngFor="let input of formView">
+                <div *ngIf="!input.isArray">
+                    <span class="text-bold">{{getKey(input)}}</span>
+                    <p>{{input[getKey(input)]}}</p>
+                </div>
+                <div *ngIf="input.isArray" class="products">
+                    <span class="titleItens">{{getKey(input)}}</span>
+                    <div *ngFor="let itemArray of input[getKey(input)]; let i=index">
+                        <div *ngIf="!itemArray.isArray">
+                            <span class="text-bold">{{getKey(itemArray)}}: </span>
+                            <span>{{itemArray[getKey(itemArray)]}}</span>
+                        </div>
+                        <div *ngIf="itemArray.isArray">
+                            <span class="titleItens">{{getKey(itemArray)}}</span>
+                            <div id="mais{{i}}" class="columns" style="display: none;">
+                                <div *ngFor="let more of itemArray[getKey(itemArray)]">
+                                    <span class="text-bold">{{getKey(more)}}: </span>
+                                    <span>{{more[getKey(more)]}}</span>
+                                </div>
+                            </div>
+                            <p id="btnVerMais{{i}}" (click)="seeMore(i)" class="seeMore">Ver
+                                Mais <i class="pi pi-angle-down"></i>
+                            </p>
                         </div>
                     </div>
-                    <div id="mais{{i}}" class="columns" style="display: none;">
-                        <div *ngFor="let input of infoRequestSaleItensMore">
-                            <span class="text-bold">{{input.label}} </span>
-                            <span>{{product[input.value]}}</span>
-                        </div>
-                    </div>
-                    <p id="btnVerMais{{i}}" (click)="seeMore(i)" class="seeMore">Ver
-                        Mais <i class="pi pi-angle-down"></i>
-                    </p>
+
                 </div>
             </div>
         </div>
 
-        <form-dynamic-angular *ngIf="titleFormSelected !== 'Solicitação de Compra'" [validateForm]=validateForm
-            title="{{titleFormSelected}}" sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}"
-            [form]=formSelected [control]=controlSelected></form-dynamic-angular>
+        <!-- create -->
+
+        <form-dynamic-angular *ngIf="!id" [validateForm]=validateForm title="{{titleFormSelected}}"
+            sigle="{{sigleFormSelected}}" description="{{descriptionFormSelected}}" [form]=formSelected
+            [control]=controlSelected></form-dynamic-angular>
     </div>
 
 </div>
